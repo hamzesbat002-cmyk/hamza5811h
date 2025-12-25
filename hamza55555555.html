@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المبرمج الأساسي - واجهة العبارات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --dark-bg: #0c0c0c;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --text-primary: #f0f0f0;
+            --text-secondary: #a0a0c0;
+            --accent: linear-gradient(90deg, #00dbde 0%, #fc00ff 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Tahoma', Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.8;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(103, 58, 183, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(244, 67, 54, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* Header Styles */
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            padding: 50px 40px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 30px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .developer-title {
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            font-weight: 800;
+            text-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
+            display: inline-block;
+            padding: 0 20px;
+        }
+
+        .developer-title::after {
+            content: '👨‍💻';
+            position: absolute;
+            left: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2.5rem;
+            filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+        }
+
+        .developer-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            font-weight: 300;
+            max-width: 900px;
+            margin: 0 auto 40px;
+            line-height: 1.8;
+            opacity: 0.9;
+        }
+
+        /* Stats Counter */
+        .stats-counter {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.03) 0%, 
+                rgba(255, 255, 255, 0.01) 100%);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .stat-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .card {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, 
+                transparent 30%, 
+                rgba(255, 255, 255, 0.02) 50%, 
+                transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .card:hover {
+            transform: translateY(-15px);
+            box-shadow: 
+                0 30px 60px rgba(0, 0, 0, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            margin-bottom: 35px;
+            color: #ffffff;
+            font-size: 1.8rem;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .card-title i {
+            margin-left: 15px;
+            font-size: 2.2rem;
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .card-title::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            right: 0;
+            width: 100px;
+            height: 2px;
+            background: var(--accent);
+        }
+
+        /* Dropdown Styles */
+        .dropdown-container {
+            margin-bottom: 25px;
+            width: 100%;
+        }
+
+        .dropdown-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 32px;
+            border-radius: 18px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: none;
+            cursor: pointer;
+            text-align: right;
+            width: 100%;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .dropdown-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+            z-index: -1;
+        }
+
+        .dropdown-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, 
+                rgba(255, 255, 255, 0.1) 0%, 
+                rgba(255, 255, 255, 0.05) 100%);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .dropdown-btn:hover::after {
+            opacity: 1;
+        }
+
+        .dropdown-btn i {
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.1rem;
+        }
+
+        .dropdown-btn.active i.fa-chevron-down {
+            transform: rotate(180deg);
+        }
+
+        .dropdown-content {
+            background: linear-gradient(135deg, 
+                rgba(30, 30, 50, 0.95) 0%, 
+                rgba(20, 20, 40, 0.98) 100%);
+            border-radius: 0 0 18px 18px;
+            margin-top: -8px;
+            padding: 0;
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: none;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(25px);
+        }
+
+        .dropdown-content.show {
+            padding: 35px;
+            max-height: 600px;
+        }
+
+        .quote {
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.03) 0%, 
+                rgba(255, 255, 255, 0.01) 100%);
+            padding: 25px;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            color: #e0e0ff;
+            border-right: 5px solid;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quote::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 15px;
+            font-size: 4rem;
+            opacity: 0.1;
+            color: inherit;
+            font-family: serif;
+        }
+
+        .quote:hover {
+            transform: translateX(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        }
+
+        .quote-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-left: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Gradient Colors */
+        .gradient-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .gradient-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .gradient-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .gradient-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .gradient-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .gradient-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .gradient-7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333 !important; }
+        .gradient-8 { background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); }
+        .gradient-9 { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); color: #333 !important; }
+        .gradient-10 { background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%); color: #333 !important; }
+
+        /* Border Colors */
+        .quote.border-1 { border-right-color: #667eea; }
+        .quote.border-2 { border-right-color: #f5576c; }
+        .quote.border-3 { border-right-color: #00f2fe; }
+        .quote.border-4 { border-right-color: #43e97b; }
+        .quote.border-5 { border-right-color: #fa709a; }
+        .quote.border-6 { border-right-color: #30cfd0; }
+        .quote.border-7 { border-right-color: #a8edea; }
+        .quote.border-8 { border-right-color: #5ee7df; }
+        .quote.border-9 { border-right-color: #d299c2; }
+        .quote.border-10 { border-right-color: #fad0c4; }
+
+        /* Number Colors */
+        .quote-number.num-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .quote-number.num-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+        .quote-number.num-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        .quote-number.num-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+        .quote-number.num-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        .quote-number.num-6 { background: linear-gradient(135deg, #30cfd0 0%, #330867 100%); }
+        .quote-number.num-7 { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #333; }
+        .quote-number.num-8 { background: linear-gradient(135deg, #5ee7df 0%, #b490ca 100%); }
+        .quote-number.num-9 { background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%); color: #333; }
+        .quote-number.num-10 { background: linear-gradient(135deg, #fad0c4 0%, #ffd1ff 100%); color: #333; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 45px 40px;
+            margin-top: 60px;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 100%);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 4px;
+            background: var(--accent);
+        }
+
+        .footer-title {
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-size: 2rem;
+            margin-bottom: 25px;
+            font-weight: 700;
+        }
+
+        .contact-info {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 35px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.05) 0%, 
+                rgba(255, 255, 255, 0.02) 100%);
+            padding: 18px 28px;
+            border-radius: 15px;
+            color: #e0e0ff;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+
+        .contact-item:hover {
+            transform: translateY(-8px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+            background: linear-gradient(135deg, 
+                rgba(255, 255, 255, 0.08) 0%, 
+                rgba(255, 255, 255, 0.04) 100%);
+        }
+
+        .contact-item i {
+            margin-left: 15px;
+            font-size: 1.3rem;
+            background: var(--accent);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        .arabic-scroll {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            text-align: right;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            margin-top: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .arabic-scroll::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .arabic-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+        }
+
+        .arabic-scroll::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+        }
+
+        .arabic-scroll::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+        }
+
+        /* Floating Note */
+        .floating-note {
+            position: fixed;
+            bottom: 30px;
+            left: -400px;
+            background: linear-gradient(135deg, #ff3366 0%, #cc0033 100%);
+            color: white;
+            padding: 18px 32px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 
+                0 10px 30px rgba(255, 51, 102, 0.4),
+                0 0 30px rgba(255, 51, 102, 0.2);
+            z-index: 10000;
+            max-width: 400px;
+            text-align: center;
+            border-right: 6px solid #ffcccc;
+            animation: slideNote 25s infinite linear;
+            animation-delay: 2s;
+            opacity: 0;
+            cursor: pointer;
+            font-family: 'Segoe UI';
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .floating-note:hover {
+            transform: scale(1.05);
+            box-shadow: 
+                0 15px 40px rgba(255, 51, 102, 0.6),
+                0 0 40px rgba(255, 51, 102, 0.3);
+        }
+
+        @keyframes slideNote {
+            0% { left: -400px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { left: calc(100% + 400px); opacity: 0; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .floating-note i {
+            animation: pulse 1.5s infinite ease-in-out;
+            margin: 0 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            }
+        }
+
+        @media (max-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .developer-title {
+                font-size: 2.8rem;
+            }
+            
+            .developer-subtitle {
+                font-size: 1.3rem;
+            }
+            
+            .stats-counter {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .contact-item {
+                min-width: 200px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .developer-title {
+                font-size: 2.2rem;
+                padding: 0 10px;
+            }
+            
+            .developer-title::after {
+                position: relative;
+                left: 0;
+                display: block;
+                margin-bottom: 15px;
+                transform: none;
+            }
+            
+            .developer-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .card {
+                padding: 30px;
+            }
+            
+            .dropdown-btn {
+                padding: 20px 25px;
+                font-size: 1.1rem;
+            }
+            
+            .stats-counter {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .contact-info {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .contact-item {
+                min-width: auto;
+                justify-content: center;
+            }
+            
+            .floating-note {
+                max-width: 90%;
+                font-size: 1rem;
+                padding: 15px 20px;
+                animation: slideNote 20s infinite linear;
+            }
+            
+            @keyframes slideNote {
+                0% { left: -100%; opacity: 0; }
+                10% { opacity: 1; }
+                90% { opacity: 1; }
+                100% { left: 100%; opacity: 0; }
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 30px 20px;
+            }
+            
+            .card {
+                padding: 25px 20px;
+            }
+            
+            .dropdown-btn {
+                padding: 18px 20px;
+                font-size: 1rem;
+            }
+            
+            .quote {
+                padding: 20px 15px;
+            }
+            
+            .footer {
+                padding: 30px 20px;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            animation: fadeIn 0.8s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="fade-in">
+            <h1 class="developer-title">المبرمج الأساسي للموقع</h1>
+            <p class="developer-subtitle">مطور واجهات وتطبيقات الويب بخبرة واسعة في تصميم وبرمجة الحلول التقنية المتكاملة مع أحدث التقنيات</p>
+            
+            <div class="stats-counter">
+                <div class="stat-item fade-in delay-1">
+                    <div class="stat-number">+99</div>
+                    <div class="stat-label">إضافة عبارات مختلفة</div>
+                </div>
+                <div class="stat-item fade-in delay-2">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">عدد العبارات</div>
+                </div>
+                <div class="stat-item fade-in delay-3">
+                    <div class="stat-number">1/1/2026</div>
+                    <div class="stat-label">آخر تحديث</div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- البطاقة الأولى -->
+            <div class="card fade-in delay-1">
+                <div class="card-title">
+                    <i class="fas fa-quote-right"></i>
+                    <h2>عرض عبارات مختلفة (القائمة الأولى)</h2>
+                </div>
+                
+                <!-- قائمة 1 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-1" onclick="toggleDropdown('quotes1')">
+                        <span><i class="fas fa-quote-right"></i> صوط لا يقال</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes1">
+                        <div class="quotes-grid">
+                            <div class="quote border-1">
+                                <span class="quote-number num-1">1</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    صوت لا يقال
+
+أقسى التجارب ليست الفقد،
+بل أن تبقى موجوداً... ولا يُسمح لك أن تقول شيئاً.
+أن تكون ممتلئاً بالكلام حتى الاختناق،
+لكنك تبتلع الكلمات خوفاً من انكسار جديد،
+تجلس أمام هاتف صامت،
+تكتب رسالة لا ترسل،
+وتتظاهر بأنك بخير بينما ينهشك الحنين من الداخل.
+
+المؤلم ليس البعد...
+بل أن يغدو القرب مستحيلاً رغم أن المسافة بينكما لا تتعدّى ضغطة إصبع.
+أن يكون من كان ملجأك يوماً،
+هو الآن جداراً صامتاً تخاف أن تطرق عليه فينهدم ما تبقى من كرامتك.
+أن تمرُّ بخاطرك مئات التفاصيل الصغيرة:
+ضحكته، طريقته في قول اسمك، صمته حين يغضب،
+لكنك تصمت... لأن الحنين لم يعد مفتاحاً للعودة.
+
+كم هو قاس أن تُمنع عن أكثر الأشخاص الذين كانوا يُنصتون إليك،
+أن يصبح الذي كان يعرفك أكثر من نفسك،
+هو السبب في صمتك الطويل،
+هو الذي علمك أن البوح أحياناً ليس شجاعةً... بل انتحاراً.
+
+تجلس كل ليلة تتحدث إليه في خيالك،
+تقول له كل ما عجزت عن قوله،
+
+تعاتبه، تبرّر له، وتغفر له،
+ثمّ تنام على وسادة رطبة من الدمع.
+كأنك حاولت النجاة بالكتمان، فانفجرت بداخلك.
+
+لكن الحقيقة يا صديقي،
+أن السكون لا يعني النسيان،
+وأنّ الامتناع عن التواصل لا يعني أننا تحرّرنا.
+إنه فقط نوعٌ من الاحترام لأنفسنا حين لم يعد في الطرف الآخر من ينصت.
+
+نحن لا نصمت لأننا بخير،
+بل لأننا نعرف أن الكلام هذه المرة لن يُغير شيئاً،
+ولأن بعض القصص تموت لا حين تنتهي،
+بل حين نُدرك أن البوح أصبح عبئاً.
+
+في النهاية...
+أقسى ما في الحب ليس الرحيل،
+بل أن يمرّ طيفه بك كل يوم.
+فتبتسم وتقول: لو عاد... ما قلت شيئاً.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 2 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-2" onclick="toggleDropdown('quotes2')">
+                        <span><i class="fas fa-quote-right"></i> الاشتياق الصامة</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes2">
+                        <div class="quotes-grid">
+                            <div class="quote border-2">
+                                <span class="quote-number num-2">2</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    أشتاقك بصمت لا يسمعه أحد، كل الشتياق صار طقساً يومياً
+أمارسه وحدي في غيابك، أحادث ظلك، وأرسمك على جدار
+الذاكرة، ثم أمحوه خوفاً من أن تبلى الصورة... لا نسياناً.
+
+لقد علمتني أن الخذلان لا يأتي بصوتٍ عالٍ بل يتسلل كنسمة
+باردة في ليلة دافئة، يأتي بابتسامة مطمئنة، بكلمة: "أنا بخير"،
+ثم يترك خلفه قلباً لا يعرف كيف يصدق ذلك.
+
+أصبحت وطناً بلا خريطة، أبحث عنك في الوجوه، في الأصوات،
+في الأماكن التي لا تشبهك لكنها تذكرني بك. أسأل عنك بصوتٍ
+خافت، وأخفي السؤال الحقيقي: هل ما زلت تذكريني حين يمر
+طيفي في بالك؟
+
+هذا الحب الذي زرعته في أرض مالحة، أرويه بصبري، وأنتظر
+معجزة لا تأتي. أعرف أن البذرة ستذبل، لكنني لا أملك إلا أن
+أرويه... روحي لا تعرف سوى العطاء، حتى لو كان النسيان هو
+الحصاد.
+
+أحياناً، أتساءل: هل أحببتك حقاً؟ أم أحببت الصورة التي رسمتها
+لك في خيالي؟ ثم أتذكر كيف كان العالم يصمت حين تبتسمين،
+فأدرك أنك كنت أكثر من فكرة... كنت حياة كاملة.
+
+الآن، أشتاقك بصمت لا يكتب، لا يقال، لا يرسل؛ أشتاقك في
+ارتعاشة الضوء، في كسرات الليل، في الحروف التي تشبهك ولا
+تحمل اسمك. أراك في الغياب أكثر مما رأيتك في الحضور، كأنك
+لم ترحلي... بل تحولت إلى ظل يسكنني.
+
+كلما حاولت نسيانك، غرقت فيك أكثر. أنظر على نفسي، وأقول
+إنني بخير، ثم تمر ضحكتك في خاطري، فأعرف أنني ما زلت
+مرتبطاً بك، وأنك الداء الوحيد الذي لا أريد الشفاء منه.
+
+كنت دائماً ضوءاً بعيداً، يكفي ليضيء حياتي، لكنه لا يكفيني لأصل
+إليه. وكلما اقتربت، دفعني القدر خطوة للوراء، كأنك خلقت
+لتكون نجمي البعيد، الذي أراه كل ليلة، لكن يدي لا تصل إليه أبداً.
+
+أحيانًا تكونين قريبة جدًا... وبعيدة جدًا في اللحظة نفسها.
+الفقد لا يبدأ حين ترحلين، بل حين أكتشف أن شيئًا في قد اختفى معك؛ كأنك أخذتِ الهواء وتركت لي الصَّدر. أتعلق حتى في الذكريات التي لم تحدث، وفي الأحلام التي عشتها وحدي.
+
+أحيانًا أسأل نفسي: هل أحببتك؟ أم أحببت الطريقة التي جعلتني أرى نفسي بها؟ ثم أسمع صوتًا يشبهك في داخلي، فأسكت السؤال. لقد صرتِ فيَّ أكثر مما ينبغي؛ حتى إنني حين أنظر في المرآة، لا أعرف إن كانت ملامحي لي أم لك. وحين أكتب، لا أعرف هل أكتبكِ أم تكتبينني.
+
+الغياب ليس صمتًا... إنه ضوضاء لا يسمعها أحد، وجع يأكل الأيام بصمت، وسؤال واحد لا يتغير: لماذا ما زلتِ في قلبي رغم كل هذا الرحيل؟
+
+أمشي في الحياة كمن يحمل حقيبةً فقد قفلها، أتظاهر بالقوة، أضحك، أنشغل، لكن في آخر الليل يعود كل شيء إلى مكانه: أنا، وأنتِ، والحقيقة التي لا أجرؤ على قولها... أنكِ ما زلتِ هنا.
+
+فإن كنتِ تسمعين هذا الآن، فاعلمي أنني لم أعد أبحث عن عودتكِ؛ أنا فقط أبحث عن نفسي التي أخذتها معك.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 3 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-3" onclick="toggleDropdown('quotes3')">
+                        <span><i class="fas fa-quote-right"></i> الهروب من الظل</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes3">
+                        <div class="quotes-grid">
+                            <div class="quote border-3">
+                                <span class="quote-number num-3">3</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    لا مكان يفتح لي ذراعيه، ولا ملجأ أستند إليه. أمضي كمن يُطارده ظله، أركض بلا وجهة، وأتعثر في طرق لا تحمل لي خريطة ولا وعوداً بالوصول.
+
+كثيراً ما أشعر أني أهرب من شيء لا أعرف حدوده، ولا ألمس شكله، وكلّ الحياة تدفع بي إلى مسارات موحشة لا يرافقني فيها سوى خوفي. أبحث عن فسحة ألتقط فيها أنفاسي، عن يد تخفّف ثقل الأيام عن كتفي، لكنّي لا أجد سوى الفراغ يتمدد حولي كصحراء لا تنتهي.
+
+إنه هروبٌ لا يشبه الهروب؛ هروبٌ يولد من العجز، من كثرة ما تهدمت في داخلي الطرق، وانطمأت الأصوات. أسافر داخلي بلا دليل، وأجرّ معي روحاً مُرهقة تبحث عن حضن دافئ، عن كلمة طمأنينة، عن أيّ ضوء يمكنه أن ينفذ إلى ما تبقى من قلبي.
+
+ومع كل خطوة، أشعر أنني لست سوى عابر في حياة لا تمنح غرباءها فرصة للراحة، وأن الطريق الذي أسير فيه لا يريد أن يرشدني، بل يصرّ على أن يبقيني تائهاً بين السؤال والصمت.
+
+هكذا أستمر... هارباً من لا شيء، ومنيعاً من كل شيء، أحمل قلبي بين يديّ كحطام، وأمضي في درب لا يعرف نهاية، ولا يُشبه البداية.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 4 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-4" onclick="toggleDropdown('quotes4')">
+                        <span><i class="fas fa-quote-right"></i> صمت لا يسمعه أحد</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes4">
+                        <div class="quotes-grid">
+                            <div class="quote border-4">
+                                <span class="quote-number num-4">4</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    لم أعد أذكر متى بدأت الحكاية، ولا كيف صار الطريق بهذا القدر من الوحشة. كل ما أعرفه أنني أسير منذ سنوات، أبحث عن شيء لا أعرف اسمه، وأهرب من وجه لا أستطيع أن أصفه. كنت أظن أن الحياة ستعطيني فرصة، أن الأقدار ستلين يوماً، لكن كل باب طرقته كان يفتح على فراغ أكبر، وكل يد مددتها طلباً للأمان، كانت تسحبني نحو الخذلان.
+
+مكتوب عليَّ أن أعيش في عالم لا يسمع أنين القلوب، عالم يقدِّس القوة حتى لو كانت مزيفة، ويحتقر الضعف حتى لو كان إنسانياً. أضحك في وجوه الناس، وأخفي دموعي في حضن الليل، كأنني أخاف أن يفضحني القمر.
+
+كم مرة حاولت أن أصرخ؟ لكن الصوت مات في حلقي، لأنني أدركت أن لا أحد سيسمعني، لا أحد سيهتم.
+
+أحببت كثيراً، وخسرت أكثر. أعطيت قلبي لمن لم يعرف قيمته، وبنيت أحلامي على أرض رخوة، فانهارت تحت قدمي بلا رحمة. كنت أظن أن الحب ينقذني، لكنه كان أول سهم أصابني في صدري. كنت أظن أن الأصدقاء يحمون، لكنهم كانوا أول من تركني في منتصف الطريق.
+
+حتى الأمان الذي حلمت به، صار بعيداً، كنجمة تتلألأ في سماء لا تطالها الأيدي.
+
+كل شيء حولي يهمس لي: "اصبر". لكنني تعبت من الصبر، تعبت من الانتظار، تعبت من نفسي التي لم تجد يوماً مرتفعاً يليق بها.
+
+أحياناً أنظر في المرآة، فأرى وجهاً غريباً، ملامح أنهكها الحزن، وعينين تحملان ألف سؤال بلا جواب. لماذا أنا؟ لماذا كل هذا مكتوب عليَّ؟ لا أجد إجابة، سوى أن القدر يكتب، ونحن نقرأ بصمت، حتى لو كانت الحروف تحرّقنا.
+
+أسير في الشوارع المزدحمة، وأشعر أنني وحدي. أسمع ضحكات الآخرين، فأبتسم مجاملة، بينما قلبي ينهار في الداخل. الليل صار صديقي الوحيد، والنجوم شهوداً على دموعي التي لا يراها أحد.
+
+أكتب كثيراً، كأنني أحاول أن أفرغ هذا القلب من شجنه، لكن الكلمات لا تشفي، ولا تمحو أثر الجرح. ربما هذا هو النصيب وربما هذه هي النهاية التي لم أخترها لكنني سأظل أمشي حتى لو كان الطريق كله وجع لأنني لا أملك خياراً آخر مكتوب عليّ أن أعيش حتى لو كانت الحياة لا تشبهني وحتى لو كان قلبي في صمت لا يسمعه أحد.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- البطاقة الثانية -->
+            <div class="card fade-in delay-2">
+                <div class="card-title">
+                    <i class="fas fa-star"></i>
+                    <h2>عرض عبارات مختلفة (القائمة الثانية)</h2>
+                </div>
+                
+                <!-- قائمة 5 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-5" onclick="toggleDropdown('quotes5')">
+                        <span><i class="fas fa-quote-right"></i> من المسافة تتجلى الأقدار</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes5">
+                        <div class="quotes-grid">
+                            <div class="quote border-5">
+                                <span class="quote-number num-5">5</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    مِنَ الْمَسَافَةِ تَتَجَلَّى الْأَقْدَارُ
+مَا شَاءَ اللهُ كَانَ، وَمَا لَمْ يَشَأْ لَمْ يَكُنْ،
+وَهَكَذَا كُتِبَ عَلَيْنَا أَلَّا نَلْتَقِيَ.
+
+تُفْرِضُ السَّمَاءُ أَحْدَاقاً بَعْدًا، لَا لِغِيبٍ فِي الْقُلُوبِ،
+بَلْ لِحِكْمَةٍ فِي الْغُيُوبِ.
+
+كُنْتَ قَرِيبًا مِنْ تَضْحِيَتِي، بَعِيدًا عَنْ غَيْبِي،
+وَكُلُّ السَّوَاقِطِ قَدَرٌ لَا يُجَانَبُ.
+
+يَسْكُنُ اسْمُكَ فِي دُعَائِي،
+وَكُلُّ الضِّحَا هُوَ آخِرُ مَا تَرَكْتَهُ لِي.
+مَا أَشَدَّ أَنْ تَسْتَلِقَ.
+
+إِلَى مَنْ كُتِبَ عَلَيْنَا الْفِرَاقَ عَنْهُ!
+لَكِنَّنَا نُسَلِّمُ لِلَّذِي جَمَعَ الْأَرْوَاحَ،
+ثُمَّ فَرَّقَهَا لِحِكْمَةٍ لَا تُعَلَّلُ.
+سَأُسَلِّمُكَ لِلْأَقْدَارِ، كَمَا تَرَكْتَنِي لَهَا،
+عَسَى أَنْ تَجْمَعَنَا فِي وَقْتٍ أَجْمَلَ.
+فَإِنْ لَمْ نَلْتَقِ فِي الدُّنْيَا، فَلْيَكُنِ اللَّقَاءُ
+عِنْدَ اللهِ أَجْمَلُ وَأَبْقَى.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 6 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-6" onclick="toggleDropdown('quotes6')">
+                        <span><i class="fas fa-quote-right"></i> على ضفاف اللقاء</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes6">
+                        <div class="quotes-grid">
+                            <div class="quote border-6">
+                                <span class="quote-number num-6">6</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    عَلَى ضِفَافِ اللَّقَاءِ
+لَقَدْ أَرَاهُ يُؤَاهِمُ ذَلِكَ الْوَجْهُ الَّذِي غَابَ.
+وَتُؤَادِي خِلْقَةً سِيَارَ الْمَسَافَاتِ وَالْأَيَّامِ.
+وَمَا غَابَ عَنِ الْقَلْبِ لَحْظَةً، مَا زِلْتُ أَحْتَفِظُ بِهِ فِي ذَاكِرَتِي كَمَا تَحْتَفِظُ الْأَرْضُ بِرَائِحَةِ الْمَطَرِ الْأُولَى، وَكَمَا يَحْفَظُ اللَّيْلُ أَسْرَارَ الْعَاشِقِينَ.
+أَفُولُ بِنَفْسِي كُلَّمَا شَاقَنِي الضَّجَرُ
+لَقَدْ لِقَاءٌ صَغِيرَةٌ تُغَيِّرُ كُلَّ شَيْءٍ.
+لَقَدْ خَطْوَةٌ وَاحِدَةٌ تَرُدُّ رُوحِي إِلَى جَسَدِهَا.
+وَلَعَلَّ نَظْرَةً مِنْهُ تُهَيِّئُ تَرْتِيبَ قُضْبَانِي مِنْ جَدِيدٍ فَأَنَا لَمْ أَتْرُكْ بَابًا لِلْأَمَلِ إِلَّا وَطَرَقْتُهُ.
+وَلَمْ أَتْرُكْ دُعَاءً إِلَّا وَرَفَعْتُهُ إِلَى السَّمَاءِ.
+وَكَأَنَّ الْكَوْنَ كُلَّهُ يَنْتَظِرُ تِلْكَ اللَّحْظَةَ الَّتِي تَلْتَقِي فِيهَا دُونَ مَوْعِدٍ
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 7 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-7" onclick="toggleDropdown('quotes7')">
+                        <span><i class="fas fa-quote-right"></i> لم أعد أزال، ولكنك ما زلت هنا</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes7">
+                        <div class="quotes-grid">
+                            <div class="quote border-7">
+                                <span class="quote-number num-7">7</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    لم تكن غريبًا... ولا كنت ضيفًا خفيف الظل
+كنت أشبه بإزاحة خفيفة في ميزان حياتي.
+تغيرت كل شيء...
+حتى الأشياء التي لم تكن تخطر ببالك
+كنت البداية التي لم أخطط لها.
+والنهاية التي لم أكن أريدها في بداية
+دخلت قلبي من أضعف نقطة.
+حين كنت أقاوم، وأحرق نفسي
+التي لم أعد بحاجة إلى أخبار، ثم جئت... لا كفقد،
+بل كظل يشبه ما تبقى من طوب
+أحببتك بطريقة لا تصلح للحديث عنها.
+بطريقة هاربة جدًا.
+كاني أضع قلبي في يديك دون أن أخبرك
+وأنت تمسك به كانك لا تدرك ماذا تحمل
+كنت قاسيًا؟
+لا كنت ضائعًا.
+وهذا أسوأ من القسوة
+خذلاني؟
+علّمتني، ولكنّي خذلت نفسي أكثر
+حين صدقت أن العشق لا يغني الزجاج
+أنا لا أزال الآن.
+ولكنك ما زلت هنا في كل شبر ناقص،
+وفي كلّ لحظة فرح أخفيها كي لا تذكرك
+
+أنت غائب.
+ولكنك خلفت وراءك الزجاج الكامل
+وتركتني بين بين لا قرب يشبه اللقاء 
+ولا بعد يشبه النسيان
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 8 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-8" onclick="toggleDropdown('quotes8')">
+                        <span><i class="fas fa-quote-right"></i> تأكل اليقين</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes8">
+                        <div class="quotes-grid">
+                            <div class="quote border-8">
+                                <span class="quote-number num-8">8</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    لم أكن أحتاج دليلاً صادماً لأعرف أنه لم يعد لي.
+الأشياء لا تنهار بضجة… الأشياء تتفكك في الصمت.
+وأنا كنتُ أسمع هذا التفكك كل يوم، كصوت خشبٍ يتشرّخ تحت خطوات لا تريد الاعتراف بثقلها.
+
+كنتُ أعرف أن هناك شيئاً ما يبتعد عني، شيئاً ما يُسحب من يدي دون أن أقاوم.
+لكنني كنتُ أتمسك بالبقايا… ببقايا اهتمام، ببقايا كلمة، ببقايا وعد كان يسقط من شفتيه بلا معنى.
+
+بدأتُ ألاحظ تفاصيل لو رآها غيري لضحك من سذاجتي.
+لكني كنت أعيش التفاصيل كطعنة، كجرحٍ صغير ينفتح كل يوم أكثر:
+
+كان يقرأ رسائلي… ولا يرد.
+كان يفتح الصور… ولا يعلّق.
+كان يشاهد حالتي… ويتجاهل.
+كان يمرّ أمام حزني وكأنه لا يراه.
+
+ولم يكن هذا هو القهر…
+القهر الحقيقي أني كنت أجد له الأعذار.
+أخلق له تبريرات وهمية، وأزيّن الواقع بأكاذيب ناعمة كي لا أواجه تلك الحقيقة العملاقة:
+أنا لم أعد في قلبه.
+
+ذات ليلة، دخلتُ غرفتي، أغلقتُ النور وجلستُ على الأرض كأنني أبحث عن نفسي بين أركان غرفتي؟
+أمسكت هاتفي… وفتحت محادثتنا.
+قرأت الرسائل القديمة التي كان يكتبها بشغفٍ يشبه الحريق، ثم نظرت إلى رسائله الجديدة…
+كانت باردة، بلا دفء، بلا لهفة، بلا أثر لروحٍ كانت تحبني.
+
+كيف يتغير الإنسان هكذا؟
+كيف يتحول من ملاذ… إلى عابر؟
+من يدٍ تمسك قلبي… إلى يدٍ تُزحزحني جانباً بلا اكتراث؟
+
+بدأتُ أشعر أني أُستخدم كنقطة رجوع فقط، محطة مؤقتة يلجأ إليها حين يختنق… لا حين يشتاق.
+كنت أسمع نبرة المزاج المتعب في صوته فأعرف أنني لست الهدف… بل الملاذ الاحتياطي.
+
+حتى سؤاله لي: "عاملة إيه؟"
+صار بلا معنى.
+أحسه الآن مجرد محاولة للحفاظ على شكل العلاقة، لا حقيقتها.
+
+كنتُ أتمسك بالخيط الأخير… رغم أنه كان يقطع يدي كلما شددته.
+كنتُ أخاف أن أفلت… رغم أني كنتُ الوحيدة التي تمسك.
+
+وبداخلي سؤال واحد ينهشني:
+هل يحبّها الآن؟
+هل صار لها مكان في قلبه؟
+هل يضحك معها تلك الضحكة التي كانت تخصّني؟
+
+كنت أكره نفسي لأنني أفكر هكذا…
+لكن الخيانة ليست مجرد فعل، إنها تشوّه داخلي… تهدم ثقتك بكل شيء، وتزرع فيك خوفاً يشبه الموت.
+
+وفي لحظة صمت، فهمت الحقيقة المرعبة:
+أنا لم أخسر الرجل…
+أنا أخسر نفسي ببطء.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- البطاقة الثالثة -->
+            <div class="card fade-in delay-3">
+                <div class="card-title">
+                    <i class="fas fa-bolt"></i>
+                    <h2>عرض عبارات مختلفة (القائمة الثالثة)</h2>
+                </div>
+                
+                <!-- قائمة 9 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-9" onclick="toggleDropdown('quotes9')">
+                        <span><i class="fas fa-quote-right"></i> غربتي التي لا تنام</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes9">
+                        <div class="quotes-grid">
+                            <div class="quote border-9">
+                                <span class="quote-number num-9">9</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    غُربتي…
+ليست في المسافة،
+بل في اتساعِ الليلِ حين لا أحد يسألني: هل نمت؟
+في فنجانِ القهوةِ الذي يبردُ بجانبي،
+ولا يد تمتدّ لتقول: دعني أعدّه لك.
+
+غُربتي…
+في كلّ صوتٍ لا يُشبه أمي،
+في كلّ وجهٍ لا يُشبه أبي،
+في كلّ ضحكةٍ لا تشبه إخوتي.
+
+غُربتي…
+في المدنِ التي لا تحفظ اسمي،
+في الطرقاتِ التي لا تعرف وقعَ خطواتي،
+في الوجوهِ الكثيرة…
+ولا عينٌ تقول لي: اشتقنا إليك.
+
+أعيش،
+لكنني لا أكون.
+أتنفّس،
+لكن روحي معلّقةٌ هناك…
+على سريرٍ قديم،
+في بيتٍ صغير،
+في وطنٍ اسمه: "الذين أحبهم."
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 10 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-10" onclick="toggleDropdown('quotes10')">
+                        <span><i class="fas fa-quote-right"></i> أنا الناضج قبل أوانه</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes10">
+                        <div class="quotes-grid">
+                            <div class="quote border-10">
+                                <span class="quote-number num-10">10</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    لم أكن مثلهم…
+كنتُ أفكّر كثيرًا،
+أصمت حين يضحكون،
+وأبتسم حين يشعرون بالضيق،
+ثم أمشي وحدي،
+كأن الطريق لا يتّسع لضحكتي.
+
+كانوا يقولون عني "كبير"،
+ليس لأنني أطولهم،
+بل لأن نظرتي أثقل،
+وصوتي حين أتكلم… يشبه الذين تعبوا كثيرًا،
+رغم أن عمري صغير.
+
+كنتُ أرى ما لا يرونه،
+أفهم ما يسخرون منه،
+وأتألم من أشياء يمرّون بها مرور العابرين…
+وكأنني أحمل في صدري حياةً سبقتني،
+وعينًا شهدت ما لم يحدث بعد.
+
+أنا لم أكن "هامدًا" كما ظنّوا،
+كنت فقط أحمل على كتفيّ أسئلة لا تليق بطفل،
+وخيباتٍ لا يفهمها إلا من كبر باكرًا،
+قبل أن يمنحه العالم فرصة أن يكون خفيفًا، عاديًا، بسيطًا.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 11 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-1" onclick="toggleDropdown('quotes11')">
+                        <span><i class="fas fa-quote-right"></i> لم أكن أعلم أن الكلمات قد تحمل خناجر</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes11">
+                        <div class="quotes-grid">
+                            <div class="quote border-1">
+                                <span class="quote-number num-1">11</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    وأنّ النظرات العابرة قد تُخلِّف ندوبًا لا تُرى،
+وأنّ بعض اللحظات تُشبه العواصف،
+تمرُّ سريعًا، لكنها تترك خلفها الخراب في داخلك.
+
+كنتُ أقف بثباتٍ يشبه الكبرياء،
+لكنّ قلبي كان هشًّا، كبيتٍ من زجاج.
+كلمة واحدة...
+نظرة واحدة...
+صمتٌ امتدّ أكثر مما ينبغي،
+فجعلني أسمع كلّ ما أخشاه من الداخل.
+
+شيءٌ ما انكسر...
+ولم أسمع صوت الكسر، بل شعرت به يرتجف في صدري.
+كأنّ سهمًا طائشًا وجد طريقه دون أن يُخطئ،
+دون أن يطرق بابًا،
+دخل بثقلٍ مفاجئ،
+وغرس أنيابه في أعمق نقطةٍ من قلبي،
+فما عادت أنفاسي كما كانت،
+ولا دقّات قلبي كما عهدتها.
+
+من قال إنّ الألم يحتاج إلى نزفٍ حتى يُرى؟
+بعض الجراح صامتة،
+تعيش معنا، تأكل من أعمارنا ببطء،
+وتجعلنا غرباء عن ذواتنا.
+
+لقد حاولت أن أتماسك،
+أن أضع ابتسامةً على وجهي،
+أن أُقنع العالم أنني بخير،
+لكن في داخلي شيءٌ يُنكر ذلك،
+شيءٌ يسألني:
+كيف تبتسم وقلبك قد طُعن بصمتٍ يشبه الخيانة؟
+
+لستُ ضعيفًا...
+لكنّي في لحظةٍ ما، تمنّيت لو أنّني لم أشعر،
+لو أنّ قلبي كان حجرًا،
+لا يتصدّع من كلمة، ولا ينكسر من غياب.
+
+لكنّني بشر...
+والبشر يوجعهم ما لا يُقال،
+ويقتلهم الصمت أكثر من الكلام.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- قائمة 12 -->
+                <div class="dropdown-container">
+                    <button class="dropdown-btn gradient-2" onclick="toggleDropdown('quotes12')">
+                        <span><i class="fas fa-quote-right"></i> أنا كما أنا... ولكنّي أنا</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content" id="quotes12">
+                        <div class="quotes-grid">
+                            <div class="quote border-2">
+                                <span class="quote-number num-2">12</span>
+                                <div class="arabic-scroll" dir="rtl">
+                                    تغيّرت كثيرًا... لا كما أرادوا لي، بل كما أرغمني الطريق.
+لم أعد ذاك القلب البسيط الذي يُصدّق كل شيء،
+ولا ذاك الصوت الذي يُجامل الوجوه الزائفة كي لا يجرح.
+أنا الآن أكثر هدوءًا،
+لكنّ في داخلي عواصف لم تهدأ.
+أكثر صمتًا،
+لكنّ رأسي يعجّ بصراخٍ لا يسمعه أحد.
+
+أنا كما لم أكن…
+أُخفي الألم بابتسامةٍ خفيفة،
+وأكتم الخذلان في صدري،
+لا لأنني قوي،
+بل لأني سئمتُ الشرح لمن لا يفهم،
+والانتظار ممن لا يأتي،
+والركض خلف من لا يرى.
+
+أصبحت أختار وحدتي بوعي،
+أحنّ إلى البدايات لكني لا أعود،
+أشتاق لأجزاء من نفسي ماتت في الطريق،
+لكنني أُدرك أن ما مضى قد ذهب،
+وأنّ ما تبقّى ليس سوى ما شكّله الألم منّي.
+
+أنا كما لم أكن…
+لكنّي ما زلت أنا،
+بتفاصيلٍ أرهقها الصبر،
+وخطوطٍ حفرتها الخيبة،
+وروحٍ كلّما انكسرت… عادت تُرتّب شتاتها بصمت.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-title">معلومات المطور</div>
+            <p>© 2026 جميع الحقوق محفوظة | تصميم وتطوير المبرمج الأساسي حمزة</p>
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    hamza1234x1@gmail.com
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone-alt"></i>
+                    +963 945 289 185
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    إدلب، الجمهورية العربية السورية
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-book-alt"></i>
+                    وَ آنِس ياربّ قَلْبي وَ أَيَّامي بالخَيْر والنُور 🤎
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Floating Note -->
+    <div class="floating-note" id="floatingNote">
+        <i class="fas fa-exclamation-circle"></i>
+        ملاحظة: هذه العبارة ليست من كتابة المطور بل من أشخاص لا يريدون ذكر أسمائهم
+        <i class="fas fa-user-secret"></i>
+    </div>
+
+    <script>
+        // إغلاق جميع القوائم المفتوحة عند فتح قائمة جديدة
+        function closeAllDropdowns() {
+            const dropdowns = document.querySelectorAll('.dropdown-content');
+            const buttons = document.querySelectorAll('.dropdown-btn');
+            
+            dropdowns.forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+            
+            buttons.forEach(button => {
+                button.classList.remove('active');
+            });
+        }
+
+        // تبديل فتح/إغلاق قائمة محددة
+        function toggleDropdown(dropdownId) {
+            const dropdown = document.getElementById(dropdownId);
+            const button = dropdown.previousElementSibling;
+            
+            // إذا كانت القائمة مفتوحة، أغلقها
+            if (dropdown.classList.contains('show')) {
+                dropdown.classList.remove('show');
+                button.classList.remove('active');
+            } else {
+                // أغلق جميع القوائم أولاً
+                closeAllDropdowns();
+                
+                // افتح القائمة المحددة
+                dropdown.classList.add('show');
+                button.classList.add('active');
+                
+                // تأثير صوتي
+                playClickSound();
+            }
+        }
+
+        // تأثير صوتي بسيط
+        function playClickSound() {
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.15);
+            } catch (e) {
+                // لا بأس إذا لم يعمل الصوت
+            }
+        }
+
+        // إغلاق القوائم عند النقر خارجها
+        document.addEventListener('click', function(event) {
+            const isDropdownButton = event.target.closest('.dropdown-btn');
+            const isDropdownContent = event.target.closest('.dropdown-content');
+            
+            if (!isDropdownButton && !isDropdownContent) {
+                closeAllDropdowns();
+            }
+        });
+
+        // فتح قائمة عشوائية عند تحميل الصفحة
+        window.addEventListener('load', function() {
+            // إضافة تأثيرات للعناصر
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${(index + 1) * 0.2}s`;
+            });
+
+            // فتح قائمة عشوائية بعد 1.5 ثانية
+            setTimeout(() => {
+                const dropdowns = document.querySelectorAll('.dropdown-container');
+                if (dropdowns.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * dropdowns.length);
+                    const randomButton = dropdowns[randomIndex].querySelector('.dropdown-btn');
+                    const dropdownId = randomButton.nextElementSibling.id;
+                    
+                    toggleDropdown(dropdownId);
+                    
+                    // إغلاقها تلقائياً بعد 4 ثوانٍ
+                    setTimeout(() => {
+                        if (document.getElementById(dropdownId).classList.contains('show')) {
+                            toggleDropdown(dropdownId);
+                        }
+                    }, 4000);
+                }
+            }, 1500);
+
+            // تفعيل النقر على الملاحظة المتحركة
+            const note = document.getElementById('floatingNote');
+            if (note) {
+                note.addEventListener('click', function() {
+                    this.style.background = 'linear-gradient(135deg, #cc0033 0%, #990022 100%)';
+                    this.style.transform = 'scale(1.1)';
+                    
+                    // عرض رسالة تنبيه
+                    const alertBox = document.createElement('div');
+                    alertBox.innerHTML = `
+                        <div style="
+                            position: fixed;
+                            top: 50%;
+                            left: 50%;
+                            transform: translate(-50%, -50%);
+                            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                            padding: 30px;
+                            border-radius: 20px;
+                            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+                            z-index: 10001;
+                            border: 2px solid rgba(255,51,102,0.5);
+                            max-width: 400px;
+                            text-align: center;
+                            backdrop-filter: blur(20px);
+                        ">
+                            <i class="fas fa-exclamation-triangle" style="
+                                font-size: 3rem;
+                                background: linear-gradient(135deg, #ff3366 0%, #cc0033 100%);
+                                -webkit-background-clip: text;
+                                background-clip: text;
+                                color: transparent;
+                                margin-bottom: 20px;
+                                display: block;
+                            "></i>
+                            <h3 style="color: #fff; margin-bottom: 15px; font-size: 1.4rem;">ملاحظة هامة</h3>
+                            <p style="color: #a0a0c0; line-height: 1.6; font-size: 1.1rem;">
+                                هذه العبارة ليست من كتابة المطور<br>
+                                بل من أشخاص لا يريدون ذكر أسمائهم
+                            </p>
+                            <button onclick="this.parentElement.remove()" style="
+                                background: linear-gradient(135deg, #ff3366 0%, #cc0033 100%);
+                                border: none;
+                                color: white;
+                                padding: 12px 30px;
+                                border-radius: 10px;
+                                margin-top: 20px;
+                                font-weight: bold;
+                                cursor: pointer;
+                                transition: transform 0.3s ease;
+                            ">
+                                فهمت
+                            </button>
+                        </div>
+                    `;
+                    document.body.appendChild(alertBox);
+                    
+                    setTimeout(() => {
+                        this.style.background = 'linear-gradient(135deg, #ff3366 0%, #cc0033 100%)';
+                        this.style.transform = 'scale(1)';
+                    }, 1000);
+                });
+            }
+        });
+
+        // تأثيرات عند التمرير
+        window.addEventListener('scroll', function() {
+            const cards = document.querySelectorAll('.card');
+            const windowHeight = window.innerHeight;
+            
+            cards.forEach(card => {
+                const cardPosition = card.getBoundingClientRect().top;
+                
+                if (cardPosition < windowHeight - 100) {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

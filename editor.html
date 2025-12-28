@@ -144,6 +144,7 @@
                     <option value="javascript">JavaScript</option>
                     <option value="python">Python</option>
                     <option value="clike">C++</option>
+                    <option value="text/x-csharp">C#</option>
                 </select>
                 <button id="run-button">تشغيل الكود</button>
             </div>
@@ -195,8 +196,15 @@
                 fullHtml = `<style>${code}</style>`;
             } else if (selectedLanguage === 'javascript') {
                 fullHtml = `<script>${code}<\/script>`;
-            } else if (selectedLanguage === 'python' || selectedLanguage === 'clike') {
-                const langName = selectedLanguage === 'python' ? 'Python' : 'C++';
+            } else if (selectedLanguage === 'python' || selectedLanguage === 'clike' || selectedLanguage === 'text/x-csharp') {
+                let langName = '';
+                if (selectedLanguage === 'python') {
+                    langName = 'Python';
+                } else if (selectedLanguage === 'clike') {
+                    langName = 'C++';
+                } else {
+                    langName = 'C#';
+                }
                 fullHtml = `
                     <body style="color: #f8f8f2; font-family: sans-serif; padding: 10px;">
                         <h2>غير معتمد</h2>

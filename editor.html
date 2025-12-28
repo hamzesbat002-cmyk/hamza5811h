@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الأكواد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: #282a36;
+            color: #f8f8f2;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .header {
+            background-color: #21222c;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+        #language-select {
+            padding: 5px;
+            border-radius: 5px;
+            background-color: #44475a;
+            color: #f8f8f2;
+            border: none;
+        }
+        .main-content {
+            display: flex;
+            flex-grow: 1;
+        }
+        .editor-container, .output-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .editor-container {
+            border-left: 1px solid #44475a;
+        }
+        h2 {
+            margin: 10px;
+        }
+        #code-editor {
+            flex-grow: 1;
+        }
+        #output {
+            flex-grow: 1;
+            background-color: #21222c;
+            border: none;
+            color: #f8f8f2;
+            padding: 10px;
+        }
+        .CodeMirror {
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>محرر الأكواد</h1>
+            <select id="language-select">
+                <option value="htmlmixed">HTML</option>
+                <option value="css">CSS</option>
+                <option value="javascript">JavaScript</option>
+                <option value="python">Python</option>
+                <option value="clike">C++</option>
+            </select>
+        </div>
+        <div class="main-content">
+            <div class="editor-container">
+                <h2>الكود</h2>
+                <textarea id="code-editor"></textarea>
+            </div>
+            <div class="output-container">
+                <h2>النتيجة</h2>
+                <iframe id="output"></iframe>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/htmlmixed/htmlmixed.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
+    <script>
+        const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
+            lineNumbers: true,
+            theme: 'dracula',
+            mode: 'htmlmixed',
+            autoCloseTags: true,
+            autoCloseBrackets: true,
+        });
+
+        const languageSelect = document.getElementById('language-select');
+        languageSelect.addEventListener('change', () => {
+            const language = languageSelect.value;
+            editor.setOption('mode', language);
+        });
+
+        function runCode() {
+            const code = editor.getValue();
+            const output = document.getElementById('output');
+            const outputDoc = output.contentDocument || output.contentWindow.document;
+
+            let fullHtml = '';
+            const selectedLanguage = languageSelect.value;
+
+            if (selectedLanguage === 'htmlmixed') {
+                fullHtml = code;
+            } else if (selectedLanguage === 'css') {
+                fullHtml = `<style>${code}</style>`;
+            } else if (selectedLanguage === 'javascript') {
+                fullHtml = `<script>${code}<\/script>`;
+            } else if (selectedLanguage === 'python' || selectedLanguage === 'clike') {
+                const langName = selectedLanguage === 'python' ? 'Python' : 'C++';
+                fullHtml = `
+                    <body style="color: #f8f8f2; font-family: sans-serif; padding: 10px;">
+                        <h2>غير معتمد</h2>
+                        <p>تنفيذ كود ${langName} مباشرة في المتصفح غير مدعوم في هذا المحرر.</p>
+                    </body>
+                `;
+            }
+
+            outputDoc.open();
+            outputDoc.write(fullHtml);
+            outputDoc.close();
+        }
+
+        // Add a run button to the header
+        const header = document.querySelector('.header');
+        const runButton = document.createElement('button');
+        runButton.textContent = 'تشغيل الكود';
+        runButton.style.padding = '5px 10px';
+        runButton.style.borderRadius = '5px';
+        runButton.style.backgroundColor = '#50fa7b';
+        runButton.style.color = '#282a36';
+        runButton.style.border = 'none';
+        runButton.style.cursor = 'pointer';
+        runButton.addEventListener('click', runCode);
+        header.appendChild(runButton);
+
+    </script>
+</body>
+</html>

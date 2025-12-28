@@ -1,0 +1,1014 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محرر الأكواد الاحترافي | CodeMaster Pro</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/dracula.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/theme/material-darker.min.css">
+    <style>
+        :root {
+            --primary-dark: #0f172a;
+            --secondary-dark: #1e293b;
+            --accent-blue: #3b82f6;
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-red: #ef4444;
+            --accent-yellow: #f59e0b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+            --sidebar-width: 280px;
+            --header-height: 70px;
+            --toolbar-height: 60px;
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 5px 15px rgba(0, 0, 0, 0.2);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Cairo', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--secondary-dark);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            box-shadow: var(--shadow-lg);
+            z-index: 100;
+        }
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .sidebar-header h2 {
+            color: var(--accent-blue);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            border-right: 3px solid transparent;
+            cursor: pointer;
+        }
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.1);
+            color: var(--accent-blue);
+            border-right-color: var(--accent-blue);
+        }
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            height: var(--header-height);
+            background-color: var(--secondary-dark);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 30px;
+            box-shadow: var(--shadow-md);
+            z-index: 50;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .logo-icon {
+            color: var(--accent-blue);
+            font-size: 1.8rem;
+        }
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-blue),
+            var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .toolbar {
+            height: var(--toolbar-height);
+            background-color: var(--secondary-dark);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            overflow-x: auto;
+        }
+        .toolbar-btn {
+            padding: 8px 16px;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .toolbar-btn:hover {
+            background-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-2px);
+        }
+        .toolbar-btn.run {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+        }
+        .toolbar-btn.run:hover {
+            background-color: rgba(16, 185, 129, 0.3);
+        }
+        .toolbar-btn.reset {
+            background-color: rgba(239, 68, 68, 0.2);
+            color: var(--accent-red);
+        }
+        .toolbar-btn.reset:hover {
+            background-color: rgba(239, 68, 68, 0.3);
+        }
+        .language-selector {
+            display: flex;
+            margin-right: auto;
+            gap: 5px;
+        }
+        .lang-btn {
+            padding: 8px 16px;
+            background-color: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .lang-btn.active {
+            background-color: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+        .editor-area {
+            flex: 1;
+            display: flex;
+            position: relative;
+            overflow: hidden;
+        }
+        .code-editor-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            border-left: 1px solid var(--border-color);
+            transition: var(--transition);
+        }
+        .code-editor-container.fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 1000;
+            background-color: var(--primary-dark);
+        }
+        .editor-header {
+            padding: 15px 20px;
+            background-color: var(--secondary-dark);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .editor-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .editor-icon {
+            font-size: 1.2rem;
+        }
+        .html-icon { color: #e34c26; }
+        .css-icon { color: #264de4; }
+        .js-icon { color: #f0db4f; }
+        .editor-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .editor-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 5px;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+        .editor-action-btn:hover {
+            color: var(--accent-blue);
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        .editor-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        .CodeMirror {
+            height: 100% !important;
+            font-family: 'Fira Code', 'Cascadia Code', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .preview-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            background-color: white;
+        }
+        .preview-header {
+            padding: 15px 20px;
+            background-color: var(--secondary-dark);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .preview-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .preview-icon {
+            color: var(--accent-green);
+        }
+        .preview-actions {
+            display: flex;
+            gap: 10px;
+        }
+        .preview-wrapper {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+        #preview-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+        .splitter {
+            width: 8px;
+            background-color: var(--border-color);
+            cursor: col-resize;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+        .splitter:hover {
+            background-color: var(--accent-blue);
+        }
+        .splitter-handle {
+            width: 3px;
+            height: 40px;
+            background-color: var(--text-secondary);
+            border-radius: 2px;
+        }
+        .stats-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(30, 41, 59, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border-color);
+            z-index: 10;
+        }
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .file-explorer {
+            position: absolute;
+            top: 0;
+            right: 100%;
+            width: 300px;
+            height: 100%;
+            background-color: var(--secondary-dark);
+            border-right: 1px solid var(--border-color);
+            transform: translateX(100%);
+            transition: var(--transition);
+            z-index: 90;
+            box-shadow: var(--shadow-lg);
+        }
+        .file-explorer.active {
+            transform: translateX(0);
+        }
+        .explorer-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .explorer-content {
+            padding: 20px;
+        }
+        .file-list {
+            list-style: none;
+        }
+        .file-item {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .file-item:hover {
+            background-color: rgba(59, 130, 246, 0.1);
+        }
+        .file-item.active {
+            background-color: rgba(59, 130, 246, 0.2);
+            color: var(--accent-blue);
+        }
+        .console-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background-color: var(--secondary-dark);
+            border-top: 1px solid var(--border-color);
+            transform: translateY(100%);
+            transition: var(--transition);
+            z-index: 80;
+            display: flex;
+            flex-direction: column;
+        }
+        .console-panel.active {
+            transform: translateY(0);
+        }
+        .console-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .console-content {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            font-family: 'Fira Code', monospace;
+            font-size: 13px;
+        }
+        .console-log {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .log-info { color: #60a5fa; }
+        .log-warn { color: #fbbf24; }
+        .log-error { color: #f87171; }
+        .log-success { color: #34d399; }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 25px;
+            border-radius: 8px;
+            background-color: var(--secondary-dark);
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 2000;
+            transition: var(--transition);
+            max-width: 500px;
+        }
+        .notification.hide {
+            opacity: 0;
+            transform: translateX(-50%) translateY(-20px);
+            pointer-events: none;
+        }
+        .notification-icon {
+            font-size: 1.2rem;
+        }
+        .notification.success .notification-icon { color: var(--accent-green); }
+        .notification.error .notification-icon { color: var(--accent-red); }
+        .notification.warning .notification-icon { color: var(--accent-yellow); }
+        .notification.info .notification-icon { color: var(--accent-blue); }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        .modal-content {
+            background-color: var(--secondary-dark);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        .modal-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-body {
+            padding: 30px;
+        }
+        .setting-group {
+            margin-bottom: 25px;
+        }
+        .setting-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .setting-control {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: var(--primary-dark);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--secondary-dark);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--border-color);
+            border-radius: 5px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-blue);
+        }
+        @media (max-width: 1200px) {
+            .sidebar {
+                position: fixed;
+                top: 0;
+                right: 0;
+                bottom: 0;
+                transform: translateX(100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .editor-area {
+                flex-direction: column;
+            }
+            .splitter {
+                width: 100%;
+                height: 8px;
+                cursor: row-resize;
+            }
+            .splitter-handle {
+                width: 40px;
+                height: 3px;
+            }
+        }
+        @media (max-width: 768px) {
+            .header {
+                padding: 0 15px;
+            }
+            .toolbar {
+                padding: 0 10px;
+            }
+            .toolbar-btn span {
+                display: none;
+            }
+            .language-selector {
+                margin-right: 0;
+            }
+            .editor-header, .preview-header {
+                padding: 12px 15px;
+            }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease forwards;
+        }
+        .CodeMirror {
+            font-size: 14px;
+            direction: ltr;
+            text-align: left;
+        }
+        .CodeMirror-scroll {
+            min-height: 300px;
+        }
+        .cm-s-monokai .CodeMirror-gutters {
+            background: #1a1a1a !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2><i class="fas fa-code"></i> CodeMaster</h2>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="editor">
+                    <i class="fas fa-edit"></i>
+                    <span>المحرر</span>
+                </a>
+                <a href="#" class="nav-item" data-section="files">
+                    <i class="fas fa-folder-open"></i>
+                    <span>إدارة الملفات</span>
+                </a>
+                <a href="#" class="nav-item" id="open-settings">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="#" class="nav-item" id="export-project">
+                    <i class="fas fa-download"></i>
+                    <span>تصدير المشروع</span>
+                </a>
+                <a href="#" class="nav-item" id="help-btn">
+                    <i class="fas fa-question-circle"></i>
+                    <span>المساعدة</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <p>الإصدار 2.0.0</p>
+                <p>CodeMaster Pro © 2023</p>
+            </div>
+        </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <header class="header">
+                <div class="logo">
+                    <i class="fas fa-code logo-icon"></i>
+                    <h1 class="logo-text">CodeMaster Pro</h1>
+                </div>
+                <div class="header-controls">
+                    <button class="toolbar-btn" id="toggle-sidebar">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <button class="toolbar-btn" id="toggle-console">
+                        <i class="fas fa-terminal"></i>
+                        <span>وحدة التحكم</span>
+                    </button>
+                    <button class="toolbar-btn" id="toggle-explorer">
+                        <i class="fas fa-folder"></i>
+                        <span>المستكشف</span>
+                    </button>
+                </div>
+            </header>
+            <!-- Toolbar -->
+            <div class="toolbar">
+                <div class="language-selector">
+                    <button class="lang-btn active" data-lang="html">HTML</button>
+                    <button class="lang-btn" data-lang="css">CSS</button>
+                    <button class="lang-btn" data-lang="js">JavaScript</button>
+                </div>
+                <button class="toolbar-btn run" id="run-code">
+                    <i class="fas fa-play"></i>
+                    <span>تشغيل</span>
+                </button>
+                <button class="toolbar-btn" id="save-code">
+                    <i class="fas fa-save"></i>
+                    <span>حفظ</span>
+                </button>
+                <button class="toolbar-btn" id="format-code">
+                    <i class="fas fa-indent"></i>
+                    <span>تنسيق</span>
+                </button>
+                <button class="toolbar-btn reset" id="reset-code">
+                    <i class="fas fa-redo"></i>
+                    <span>إعادة تعيين</span>
+                </button>
+                <button class="toolbar-btn" id="toggle-fullscreen">
+                    <i class="fas fa-expand"></i>
+                    <span>ملء الشاشة</span>
+                </button>
+                <button class="toolbar-btn" id="toggle-preview">
+                    <i class="fas fa-eye"></i>
+                    <span>إظهار/إخفاء المعاينة</span>
+                </button>
+            </div>
+            <!-- Editor Area -->
+            <div class="editor-area">
+                <!-- File Explorer -->
+                <div class="file-explorer" id="file-explorer">
+                    <div class="explorer-header">
+                        <h3><i class="fas fa-folder"></i> الملفات</h3>
+                        <button class="editor-action-btn" id="close-explorer">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="explorer-content">
+                        <ul class="file-list">
+                            <li class="file-item active" data-file="index.html">
+                                <i class="fab fa-html5 html-icon"></i>
+                                <span>index.html</span>
+                            </li>
+                            <li class="file-item" data-file="style.css">
+                                <i class="fab fa-css3-alt css-icon"></i>
+                                <span>style.css</span>
+                            </li>
+                            <li class="file-item" data-file="script.js">
+                                <i class="fab fa-js-square js-icon"></i>
+                                <span>script.js</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                <!-- Code Editor -->
+                <div class="code-editor-container" id="editor-container">
+                    <div class="editor-header">
+                        <div class="editor-title">
+                            <i class="fab fa-html5 editor-icon html-icon"></i>
+                            <h3>index.html</h3>
+                        </div>
+                        <div class="editor-actions">
+                            <button class="editor-action-btn" title="تكبير النص" id="zoom-in">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                            <button class="editor-action-btn" title="تصغير النص" id="zoom-out">
+                                <i class="fas fa-search-minus"></i>
+                            </button>
+                            <button class="editor-action-btn" title="إخفاء المحرر" id="hide-editor">
+                                <i class="fas fa-eye-slash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="editor-wrapper">
+                        <textarea id="html-editor-textarea"></textarea>
+                        <textarea id="css-editor-textarea" style="display:none;"></textarea>
+                        <textarea id="js-editor-textarea" style="display:none;"></textarea>
+                    </div>
+                    <div class="stats-panel">
+                        <div class="stat-item">
+                            <i class="fas fa-font"></i>
+                            <span>الأحرف: <span id="char-count">0</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-code"></i>
+                            <span>الأسطر: <span id="line-count">0</span></span>
+                        </div>
+                        <div class="stat-item">
+                            <i class="fas fa-clock"></i>
+                            <span>آخر تحديث: <span id="last-update">الآن</span></span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Splitter -->
+                <div class="splitter" id="splitter">
+                    <div class="splitter-handle"></div>
+                </div>
+                <!-- Preview Panel -->
+                <div class="preview-panel" id="preview-panel">
+                    <div class="preview-header">
+                        <div class="preview-title">
+                            <i class="fas fa-eye preview-icon"></i>
+                            <h3>المعاينة المباشرة</h3>
+                        </div>
+                        <div class="preview-actions">
+                            <button class="toolbar-btn" id="refresh-preview">
+                                <i class="fas fa-sync-alt"></i>
+                                <span>تحديث</span>
+                            </button>
+                            <button class="toolbar-btn" id="open-in-new-tab">
+                                <i class="fas fa-external-link-alt"></i>
+                                <span>فتح في علامة تبويب جديدة</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="preview-wrapper">
+                        <iframe id="preview-frame"></iframe>
+                    </div>
+                </div>
+                <!-- Console -->
+                <div class="console-panel" id="console-panel">
+                    <div class="console-header">
+                        <h3><i class="fas fa-terminal"></i> وحدة التحكم</h3>
+                        <button class="editor-action-btn" id="clear-console">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="console-content" id="console-content">
+                        <!-- Console logs will appear here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> الإعدادات</h2>
+                <button class="editor-action-btn" id="close-settings">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label class="setting-label">مظهر المحرر</label>
+                    <select class="setting-control" id="editor-theme">
+                        <option value="monokai">Monokai</option>
+                        <option value="dracula">Dracula</option>
+                        <option value="material-darker">Material Darker</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">حجم الخط</label>
+                    <select class="setting-control" id="font-size">
+                        <option value="12">صغير (12px)</option>
+                        <option value="14" selected>متوسط (14px)</option>
+                        <option value="16">كبير (16px)</option>
+                        <option value="18">كبير جداً (18px)</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label class="setting-label">وضع السطور</label>
+                    <select class="setting-control" id="line-wrapping">
+                        <option value="off">غير مفعل</option>
+                        <option value="on" selected>مفعل</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <button class="toolbar-btn" style="width: 100%;" id="save-settings">
+                        <i class="fas fa-save"></i>
+                        حفظ الإعدادات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Help Modal -->
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-question-circle"></i> المساعدة</h2>
+                <button class="editor-action-btn" id="close-help">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <h3>محرر CodeMaster Pro</h3>
+                <p>محرر أكواد احترافي يدعم HTML و CSS و JavaScript.</p>
+                <h4>اختصارات لوحة المفاتيح:</h4>
+                <ul>
+                    <li><strong>Ctrl+S</strong>: حفظ المشروع</li>
+                    <li><strong>Ctrl+R</strong>: تشغيل الكود</li>
+                    <li><strong>Ctrl+Space</strong>: الإكمال التلقائي</li>
+                    <li><strong>Ctrl+/</strong>: تعليق/إلغاء تعليق السطر</li>
+                    <li><strong>F11</strong>: ملء الشاشة</li>
+                </ul>
+                <h4>المميزات:</h4>
+                <ul>
+                    <li>تلوين بناء الجملة</li>
+                    <li>ترقيم الأسطر</li>
+                    <li>معاينة مباشرة</li>
+                    <li>وحدة تحكم متكاملة</li>
+                    <li>حفظ تلقائي</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let htmlEditor, cssEditor, jsEditor;
+            let editors = {};
+            let currentEditor = 'html';
+            let fontSize = 14;
+            let currentTheme = 'monokai';
+
+            function initializeEditors() {
+                // HTML Editor
+                htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor-textarea'), {
+                    mode: 'htmlmixed',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseTags: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                // CSS Editor
+                cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor-textarea'), {
+                    mode: 'css',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                // JavaScript Editor
+                jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor-textarea'), {
+                    mode: 'javascript',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                editors = {
+                    html: htmlEditor,
+                    css: cssEditor,
+                    js: jsEditor
+                };
+
+                Object.values(editors).forEach(editor => {
+                    editor.setSize('100%', '100%');
+                    editor.on('change', function() {
+                        updateEditorStats();
+                        clearTimeout(window.previewTimeout);
+                        window.previewTimeout = setTimeout(updatePreview, 1000);
+                    });
+                });
+
+                // Set initial content
+                fetch('./index.html').then(res => res.text()).then(data => htmlEditor.setValue(data));
+                fetch('./style.css').then(res => res.text()).then(data => cssEditor.setValue(data));
+                fetch('./script.js').then(res => res.text()).then(data => jsEditor.setValue(data));
+
+                updateEditorUI();
+            }
+
+            function initializeEventListeners() {
+                // Language selector
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        currentEditor = this.dataset.lang;
+                        updateEditorUI();
+                    });
+                });
+                // Toolbar buttons
+                document.getElementById('run-code').addEventListener('click', runCode);
+            }
+
+            function updateEditorUI() {
+                Object.values(editors).forEach(editor => {
+                    editor.getWrapperElement().style.display = 'none';
+                });
+                editors[currentEditor].getWrapperElement().style.display = 'block';
+                editors[currentEditor].refresh();
+            }
+
+            function runCode() {
+                updatePreview();
+            }
+
+            function updatePreview() {
+                const htmlCode = htmlEditor.getValue();
+                const cssCode = cssEditor.getValue();
+                const jsCode = jsEditor.getValue();
+                const previewFrame = document.getElementById('preview-frame');
+
+                const sourceDoc = `
+                    <html>
+                        <head>
+                            <style>${cssCode}</style>
+                        </head>
+                        <body>
+                            ${htmlCode}
+                            <script>${jsCode}<\/script>
+                        </body>
+                    </html>
+                `;
+
+                previewFrame.srcdoc = sourceDoc;
+            }
+
+            // --- Main Execution ---
+            initializeEditors();
+            initializeEventListeners();
+            updatePreview();
+
+        });
+    </script>
+</body>
+</html>

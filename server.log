@@ -1,3 +1,6 @@
-127.0.0.1 - - [28/Dec/2025 02:09:28] code 404, message File not found
-127.0.0.1 - - [28/Dec/2025 02:09:28] "GET /codemaster_fixed.html HTTP/1.1" 404 -
-127.0.0.1 - - [28/Dec/2025 02:12:25] "GET /codemaster_fixed.html HTTP/1.1" 200 -
+127.0.0.1 - - [28/Dec/2025 15:04:08] code 404, message File not found
+127.0.0.1 - - [28/Dec/2025 15:04:08] "GET /codemaster_fixed.html HTTP/1.1" 404 -
+127.0.0.1 - - [28/Dec/2025 15:04:51] "GET /code_editor/codemaster_fixed.html HTTP/1.1" 200 -
+127.0.0.1 - - [28/Dec/2025 15:05:48] "GET /code_editor/codemaster_fixed.html HTTP/1.1" 200 -
+127.0.0.1 - - [28/Dec/2025 15:06:43] "GET /code_editor/codemaster_fixed.html HTTP/1.1" 200 -
+127.0.0.1 - - [28/Dec/2025 15:07:39] "GET /code_editor/codemaster_fixed.html HTTP/1.1" 200 -

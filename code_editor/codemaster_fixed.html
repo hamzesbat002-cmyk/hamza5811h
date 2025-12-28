@@ -873,1045 +873,141 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.2/mode/htmlmixed/htmlmixed.min.js"></script>
 
     <script>
-        // Initialize variables
-        let htmlEditor, cssEditor, jsEditor;
-        let editors = {};
-        let currentEditor = 'html';
-        let fontSize = 14;
-        let currentTheme = 'monokai';
-
-        // Initialize the editor
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize variables
+            let htmlEditor, cssEditor, jsEditor;
+            let editors = {};
+            let currentEditor = 'html';
+            let fontSize = 14;
+            let currentTheme = 'monokai';
+
+            function initializeEditors() {
+                // HTML Editor
+                htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor-textarea'), {
+                    mode: 'htmlmixed',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseTags: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                // CSS Editor
+                cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor-textarea'), {
+                    mode: 'css',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                // JavaScript Editor
+                jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor-textarea'), {
+                    mode: 'javascript',
+                    theme: currentTheme,
+                    lineNumbers: true,
+                    lineWrapping: true,
+                    autoCloseBrackets: true,
+                    matchBrackets: true,
+                    styleActiveLine: true,
+                    extraKeys: {
+                        "Ctrl-S": function() { saveCode(); },
+                        "Ctrl-R": function() { runCode(); },
+                        "F11": function() { toggleFullscreen(); },
+                        "Ctrl-/": "toggleComment"
+                    }
+                });
+
+                editors = {
+                    html: htmlEditor,
+                    css: cssEditor,
+                    js: jsEditor
+                };
+
+                Object.values(editors).forEach(editor => {
+                    editor.setSize('100%', '100%');
+                    editor.on('change', function() {
+                        updateEditorStats();
+                        clearTimeout(window.previewTimeout);
+                        window.previewTimeout = setTimeout(updatePreview, 1000);
+                    });
+                });
+
+                // Set initial content
+                fetch('./index.html').then(res => res.text()).then(data => htmlEditor.setValue(data));
+                fetch('./style.css').then(res => res.text()).then(data => cssEditor.setValue(data));
+                fetch('./script.js').then(res => res.text()).then(data => jsEditor.setValue(data));
+
+                updateEditorUI();
+            }
+
+            function initializeEventListeners() {
+                // Language selector
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        currentEditor = this.dataset.lang;
+                        updateEditorUI();
+                    });
+                });
+                // Toolbar buttons
+                document.getElementById('run-code').addEventListener('click', runCode);
+            }
+
+            function updateEditorUI() {
+                Object.values(editors).forEach(editor => {
+                    editor.getWrapperElement().style.display = 'none';
+                });
+                editors[currentEditor].getWrapperElement().style.display = 'block';
+                editors[currentEditor].refresh();
+            }
+
+            function runCode() {
+                updatePreview();
+            }
+
+            function updatePreview() {
+                const htmlCode = htmlEditor.getValue();
+                const cssCode = cssEditor.getValue();
+                const jsCode = jsEditor.getValue();
+                const previewFrame = document.getElementById('preview-frame');
+
+                const sourceDoc = `
+                    <html>
+                        <head>
+                            <style>${cssCode}</style>
+                        </head>
+                        <body>
+                            ${htmlCode}
+                            <script>${jsCode}<\/script>
+                        </body>
+                    </html>
+                `;
+
+                previewFrame.srcdoc = sourceDoc;
+            }
+
+            // --- Main Execution ---
             initializeEditors();
             initializeEventListeners();
             updatePreview();
-            showNotification('مرحباً بك في CodeMaster Pro!', 'info');
-            logToConsole('تم تحميل محرر الأكواد بنجاح', 'success');
-        });
 
-        function initializeEditors() {
-            // HTML Editor
-            htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor-textarea'), {
-                mode: 'htmlmixed',
-                theme: currentTheme,
-                lineNumbers: true,
-                lineWrapping: true,
-                autoCloseTags: true,
-                matchBrackets: true,
-                styleActiveLine: true,
-                extraKeys: {
-                    "Ctrl-S": function() { saveCode(); },
-                    "Ctrl-R": function() { runCode(); },
-                    "F11": function() { toggleFullscreen(); },
-                    "Ctrl-/": "toggleComment"
-                }
-            });
-
-            // CSS Editor
-            cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor-textarea'), {
-                mode: 'css',
-                theme: currentTheme,
-                lineNumbers: true,
-                lineWrapping: true,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                styleActiveLine: true,
-                extraKeys: {
-                    "Ctrl-S": function() { saveCode(); },
-                    "Ctrl-R": function() { runCode(); },
-                    "F11": function() { toggleFullscreen(); },
-                    "Ctrl-/": "toggleComment"
-                }
-            });
-
-            // JavaScript Editor
-            jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor-textarea'), {
-                mode: 'javascript',
-                theme: currentTheme,
-                lineNumbers: true,
-                lineWrapping: true,
-                autoCloseBrackets: true,
-                matchBrackets: true,
-                styleActiveLine: true,
-                extraKeys: {
-                    "Ctrl-S": function() { saveCode(); },
-                    "Ctrl-R": function() { runCode(); },
-                    "F11": function() { toggleFullscreen(); },
-                    "Ctrl-/": "toggleComment"
-                }
-            });
-
-            editors = {
-                html: htmlEditor,
-                css: cssEditor,
-                js: jsEditor
-            };
-
-            Object.values(editors).forEach(editor => {
-                editor.setSize('100%', '100%');
-                editor.on('change', function() {
-                    updateEditorStats();
-                    clearTimeout(window.previewTimeout);
-                    window.previewTimeout = setTimeout(updatePreview, 1000);
-                });
-            });
-
-            // Set initial content
-            htmlEditor.setValue(`<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مشروعي الاحترافي</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <!-- المحتوى الأولي لملف index.html -->
-    <div class="container">
-        <header class="header">
-            <h1 class="logo">مشروعي<span>Pro</span></h1>
-            <nav class="nav">
-                <a href="#" class="nav-link active">الرئيسية</a>
-                <a href="#" class="nav-link">الخدمات</a>
-                <a href="#" class="nav-link">المشاريع</a>
-                <a href="#" class="nav-link">اتصل بنا</a>
-            </nav>
-            <button class="menu-toggle" id="menu-toggle">
-                <i class="fas fa-bars"></i>
-            </button>
-        </header>
-
-        <main class="main-content">
-            <section class="hero">
-                <div class="hero-content">
-                    <h2>مرحباً بك في مشروعي الاحترافي</h2>
-                    <p>هذا مثال على صفحة ويب تفاعلية تم إنشاؤها باستخدام محرر CodeMaster Pro. يمكنك تعديل الأكواد ومعاينة النتائج مباشرة.</p>
-                    <button class="btn btn-primary" id="action-btn">جرب التفاعل</button>
-                </div>
-                <div class="hero-image">
-                    <div class="code-placeholder">
-                        <pre><code>function helloWorld() {
-    console.log("مرحباً بالعالم!");
-    return "نجاح";
-}</code></pre>
-                    </div>
-                </div>
-            </section>
-
-            <section class="features">
-                <h3>المميزات الرئيسية</h3>
-                <div class="features-grid">
-                    <div class="feature-card">
-                        <i class="fas fa-bolt"></i>
-                        <h4>سريع</h4>
-                        <p>أداء عالي وسرعة في التنفيذ</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-shield-alt"></i>
-                        <h4>آمن</h4>
-                        <p>حماية وأمان للبيانات والمشاريع</p>
-                    </div>
-                    <div class="feature-card">
-                        <i class="fas fa-mobile-alt"></i>
-                        <h4>متجاوب</h4>
-                        <p>يتوافق مع جميع أحجام الشاشات</p>
-                    </div>
-                </div>
-            </section>
-
-            <section class="stats">
-                <h3>الإحصائيات</h3>
-                <div class="stats-container">
-                    <div class="stat">
-                        <span class="stat-number" id="stat1">0</span>
-                        <span class="stat-label">مشروع مكتمل</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number" id="stat2">0</span>
-                        <span class="stat-label">عميل راضٍ</span>
-                    </div>
-                    <div class="stat">
-                        <span class="stat-number" id="stat3">0</span>
-                        <span class="stat-label">ساعة عمل</span>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="footer">
-            <p>تم التطوير باستخدام <strong>CodeMaster Pro</strong> &copy; 2023</p>
-            <div class="footer-links">
-                <a href="#">الشروط</a>
-                <a href="#">الخصوصية</a>
-                <a href="#">اتصل بنا</a>
-            </div>
-        </footer>
-    </div>
-    <script src="script.js"></script>
-</body>
-</html>`);
-
-            cssEditor.setValue(`* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-body {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: #333;
-    min-height: 100vh;
-    padding: 20px;
-}
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    background-color: white;
-    border-radius: 20px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-    overflow: hidden;
-}
-
-.header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 25px 40px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    color: white;
-}
-
-.logo {
-    font-size: 2.2rem;
-    font-weight: 800;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.logo span {
-    background-color: white;
-    color: #667eea;
-    padding: 5px 15px;
-    border-radius: 30px;
-    font-size: 1rem;
-    margin-right: 10px;
-}
-
-.nav {
-    display: flex;
-    gap: 30px;
-}
-
-.nav-link {
-    color: white;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-}
-
-.nav-link:hover, .nav-link.active {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.menu-toggle {
-    display: none;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.5rem;
-    cursor: pointer;
-}
-
-.main-content {
-    padding: 40px;
-}
-
-.hero {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 50px;
-    margin-bottom: 60px;
-    align-items: center;
-}
-
-.hero-content h2 {
-    font-size: 2.8rem;
-    margin-bottom: 20px;
-    color: #2d3748;
-    line-height: 1.2;
-}
-
-.hero-content p {
-    font-size: 1.2rem;
-    color: #4a5568;
-    margin-bottom: 30px;
-    line-height: 1.7;
-}
-
-.btn {
-    padding: 14px 32px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.btn-primary {
-    background: linear-gradient(90deg, #667eea, #764ba2);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
-}
-
-.hero-image {
-    background-color: #f7fafc;
-    border-radius: 15px;
-    padding: 30px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-
-.code-placeholder {
-    background-color: #2d3748;
-    border-radius: 10px;
-    padding: 20px;
-    overflow: auto;
-}
-
-.code-placeholder pre {
-    margin: 0;
-    color: #e2e8f0;
-    font-family: 'Fira Code', monospace;
-    font-size: 0.9rem;
-}
-
-.features {
-    margin-bottom: 60px;
-}
-
-.features h3 {
-    font-size: 2.2rem;
-    margin-bottom: 40px;
-    text-align: center;
-    color: #2d3748;
-}
-
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-}
-
-.feature-card {
-    background-color: #f8fafc;
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    transition: all 0.3s ease;
-    border: 2px solid transparent;
-}
-
-.feature-card:hover {
-    transform: translateY(-10px);
-    border-color: #667eea;
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.feature-card i {
-    font-size: 2.5rem;
-    color: #667eea;
-    margin-bottom: 20px;
-}
-
-.feature-card h4 {
-    font-size: 1.5rem;
-    margin-bottom: 15px;
-    color: #2d3748;
-}
-
-.stats {
-    background-color: #f7fafc;
-    padding: 40px;
-    border-radius: 15px;
-    margin-bottom: 40px;
-}
-
-.stats h3 {
-    font-size: 2.2rem;
-    margin-bottom: 40px;
-    text-align: center;
-    color: #2d3748;
-}
-
-.stats-container {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 30px;
-    text-align: center;
-}
-
-.stat {
-    padding: 30px;
-    background-color: white;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-}
-
-.stat-number {
-    display: block;
-    font-size: 3.5rem;
-    font-weight: 800;
-    color: #667eea;
-    margin-bottom: 10px;
-}
-
-.stat-label {
-    font-size: 1.2rem;
-    color: #4a5568;
-    font-weight: 600;
-}
-
-.footer {
-    text-align: center;
-    padding: 30px 40px;
-    background-color: #2d3748;
-    color: white;
-    border-top: 1px solid #4a5568;
-}
-
-.footer p {
-    margin-bottom: 20px;
-    font-size: 1.1rem;
-}
-
-.footer-links {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-}
-
-.footer-links a {
-    color: #cbd5e0;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
-
-.footer-links a:hover {
-    color: white;
-    text-decoration: underline;
-}
-
-@media (max-width: 992px) {
-    .hero {
-        grid-template-columns: 1fr;
-        text-align: center;
-    }
-    .features-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
-    .header {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
-    .nav {
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-    .features-grid {
-        grid-template-columns: 1fr;
-    }
-    .stats-container {
-        grid-template-columns: 1fr;
-    }
-    .hero-content h2 {
-        font-size: 2.2rem;
-    }
-}`);
-
-            jsEditor.setValue(`// كود JavaScript للمشروع
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('تم تحميل الصفحة بنجاح!');
-
-    // تهيئة الأرقام المتحركة
-    initializeCounterAnimation();
-
-    // إعداد الأحداث
-    setupEventListeners();
-
-    // إظهار رسالة ترحيب
-    setTimeout(() => {
-        alert('مرحباً! تم تحميل المشروع بنجاح.');
-    }, 1000);
-});
-
-function initializeCounterAnimation() {
-    const counters = [
-        { id: 'stat1', target: 150, duration: 2000 },
-        { id: 'stat2', target: 95, duration: 2500 },
-        { id: 'stat3', target: 2500, duration: 3000 }
-    ];
-
-    counters.forEach(counter => {
-        const element = document.getElementById(counter.id);
-        if (element) {
-            animateCounter(element, 0, counter.target, counter.duration);
-        }
-    });
-}
-
-function animateCounter(element, start, end, duration) {
-    let startTimestamp = null;
-    const step = (timestamp) => {
-        if (!startTimestamp) startTimestamp = timestamp;
-        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-        const currentValue = Math.floor(progress * (end - start) + start);
-        element.textContent = currentValue;
-        if (progress < 1) {
-            window.requestAnimationFrame(step);
-        }
-    };
-    window.requestAnimationFrame(step);
-}
-
-function setupEventListeners() {
-    // زر العمل الرئيسي
-    const actionBtn = document.getElementById('action-btn');
-    if (actionBtn) {
-        actionBtn.addEventListener('click', function() {
-            console.log('تم النقر على زر العمل الرئيسي');
-
-            // تغيير نص الزر
-            const originalText = actionBtn.innerHTML;
-            actionBtn.innerHTML = '<i class="fas fa-check"></i> تم التنفيذ!';
-            actionBtn.style.backgroundColor = '#10b981';
-
-            // إضافة تأثير
-            this.classList.add('animated');
-
-            // عرض رسالة
-            alert('تم تنفيذ الإجراء بنجاح!');
-
-            // العودة إلى الحالة الأصلية بعد 3 ثوان
-            setTimeout(() => {
-                actionBtn.innerHTML = originalText;
-                actionBtn.style.backgroundColor = '';
-                this.classList.remove('animated');
-            }, 3000);
-        });
-    }
-
-    // زر تبديل القائمة (للأجهزة المحمولة)
-    const menuToggle = document.getElementById('menu-toggle');
-    const nav = document.querySelector('.nav');
-
-    if (menuToggle && nav) {
-        menuToggle.addEventListener('click', function() {
-            nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
-            this.innerHTML = nav.style.display === 'flex' ?
-                '<i class="fas fa-times"></i>' :
-                '<i class="fas fa-bars"></i>';
-
-            console.log(\`تم \\\${nav.style.display === 'flex' ? 'فتح' : 'إغلاق'} القائمة\`);
-        });
-    }
-
-    // روابط التنقل
-    const navLinks = document.querySelectorAll('.nav-link');
-    navLinks.forEach(link => {
-        link.addEventListener('click', function(e) {
-            e.preventDefault();
-            console.log(\`تم النقر على: \\\${this.textContent}\`);
-
-            // تحديث الروابط النشطة
-            navLinks.forEach(l => l.classList.remove('active'));
-            this.classList.add('active');
-
-            // تمرير سلس إلى القسم المناسب
-            const targetId = this.getAttribute('href').substring(1);
-            if (targetId) {
-                const targetSection = document.getElementById(targetId);
-                if (targetSection) {
-                    window.scrollTo({
-                        top: targetSection.offsetTop - 100,
-                        behavior: 'smooth'
-                    });
-                }
-            }
-        });
-    });
-
-    // بطاقات الميزات
-    const featureCards = document.querySelectorAll('.feature-card');
-    featureCards.forEach(card => {
-        card.addEventListener('click', function() {
-            const title = this.querySelector('h4').textContent;
-            console.log(\`تم النقر على ميزة: \\\${title}\`);
-
-            // تأثير النقر
-            this.style.transform = 'scale(0.95)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 300);
-        });
-    });
-}`);
-
-            updateEditorUI();
-        }
-
-        function initializeEventListeners() {
-            // Sidebar toggle
-            document.getElementById('toggle-sidebar').addEventListener('click',
-            function() {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
-            // File explorer toggle
-            document.getElementById('toggle-explorer').addEventListener('click',
-            function() {
-                document.getElementById('file-explorer').classList.toggle('active');
-            });
-            document.getElementById('close-explorer').addEventListener('click',
-            function() {
-                document.getElementById('file-explorer').classList.remove('active');
-            });
-            // Console toggle
-            document.getElementById('toggle-console').addEventListener('click',
-            function() {
-                document.getElementById('console-panel').classList.toggle('active');
-            });
-            document.getElementById('clear-console').addEventListener('click',
-            function() {
-                document.getElementById('console-content').innerHTML = '';
-                logToConsole('تم مسح وحدة التحكم', 'info');
-            });
-            // Language selector
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    currentEditor = this.dataset.lang;
-                    updateEditorUI();
-                });
-            });
-            // Toolbar buttons
-            document.getElementById('run-code').addEventListener('click', runCode);
-            document.getElementById('save-code').addEventListener('click', saveCode);
-            document.getElementById('format-code').addEventListener('click', formatCode);
-            document.getElementById('reset-code').addEventListener('click', resetCode);
-            document.getElementById('toggle-fullscreen').addEventListener('click', toggleFullscreen);
-            document.getElementById('toggle-preview').addEventListener('click', togglePreview);
-
-            // Editor actions
-            document.getElementById('zoom-in').addEventListener('click', zoomIn);
-            document.getElementById('zoom-out').addEventListener('click', zoomOut);
-            document.getElementById('hide-editor').addEventListener('click', hideEditor);
-
-            // Preview actions
-            document.getElementById('refresh-preview').addEventListener('click', updatePreview);
-            document.getElementById('open-in-new-tab').addEventListener('click', openInNewTab);
-
-            // Sidebar navigation
-             document.getElementById('open-settings').addEventListener('click', openSettings);
-             document.getElementById('export-project').addEventListener('click', exportProject);
-             document.getElementById('help-btn').addEventListener('click', () => document.getElementById('help-modal').classList.add('active'));
-
-            // Settings Modal
-            document.getElementById('close-settings').addEventListener('click', () => document.getElementById('settings-modal').classList.remove('active'));
-            document.getElementById('save-settings').addEventListener('click', saveSettings);
-
-            // Help Modal
-            document.getElementById('close-help').addEventListener('click', () => document.getElementById('help-modal').classList.remove('active'));
-
-             // Splitter functionality
-            const splitter = document.getElementById('splitter');
-            const editorContainer = document.getElementById('editor-container');
-            const previewPanel = document.getElementById('preview-panel');
-            let isDragging = false;
-
-            splitter.addEventListener('mousedown', function(e) {
-                isDragging = true;
-                e.preventDefault();
-            });
-
-            document.addEventListener('mousemove', function(e) {
-                if (!isDragging) return;
-                const totalWidth = document.querySelector('.editor-area').offsetWidth;
-                const newEditorWidth = e.clientX - editorContainer.getBoundingClientRect().left;
-                const newPreviewWidth = totalWidth - newEditorWidth;
-
-                if (newEditorWidth > 200 && newPreviewWidth > 200) {
-                    editorContainer.style.flex = `0 1 ${newEditorWidth}px`;
-                    previewPanel.style.flex = `0 1 ${newPreviewWidth}px`;
-                }
-            });
-
-            document.addEventListener('mouseup', function() {
-                isDragging = false;
-            });
-        }
-
-        function updateEditorUI() {
-            Object.values(editors).forEach(editor => {
-                editor.getWrapperElement().style.display = 'none';
-            });
-            editors[currentEditor].getWrapperElement().style.display = 'block';
-            editors[currentEditor].refresh();
-
-            const titleMap = {
-                'html': { icon: 'fab fa-html5 html-icon', name: 'index.html' },
-                'css': { icon: 'fab fa-css3-alt css-icon', name: 'style.css' },
-                'js': { icon: 'fab fa-js-square js-icon', name: 'script.js' }
-            };
-            const current = titleMap[currentEditor];
-            const editorTitle = document.querySelector('.editor-title');
-            editorTitle.innerHTML = `
-                <i class="${current.icon} editor-icon"></i>
-                <h3>${current.name}</h3>
-            `;
-            updateEditorStats();
-        }
-
-        function updateEditorStats() {
-            const editor = editors[currentEditor];
-            const content = editor.getValue();
-            document.getElementById('char-count').textContent = content.length;
-            document.getElementById('line-count').textContent = editor.lineCount();
-            const now = new Date();
-            document.getElementById('last-update').textContent = now.toLocaleTimeString('ar-EG');
-        }
-
-        function runCode() {
-            updatePreview();
-            logToConsole('تم تشغيل الكود بنجاح', 'success');
-            showNotification('تم تشغيل الكود بنجاح', 'success');
-        }
-
-        function updatePreview() {
-            const htmlCode = htmlEditor.getValue();
-            const cssCode = cssEditor.getValue();
-            const jsCode = jsEditor.getValue();
-            const previewFrame = document.getElementById('preview-frame');
-
-            const fullCode = `
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <base target="_parent">
-                    <style>${cssCode}</style>
-                </head>
-                <body>
-                    ${htmlCode}
-                    <script>
-                        // Override console methods to log to our console
-                        const originalLog = console.log;
-                        const originalError = console.error;
-                        const originalWarn = console.warn;
-                        const originalInfo = console.info;
-
-                        console.log = function(...args) {
-                            originalLog.apply(console, args);
-                            if (window.parent && window.parent.logToConsole) {
-                                window.parent.logToConsole(args.join(' '), 'info');
-                            }
-                        };
-
-                        console.error = function(...args) {
-                            originalError.apply(console, args);
-                            if (window.parent && window.parent.logToConsole) {
-                                window.parent.logToConsole(args.join(' '), 'error');
-                            }
-                        };
-
-                        console.warn = function(...args) {
-                            originalWarn.apply(console, args);
-                            if (window.parent && window.parent.logToConsole) {
-                                window.parent.logToConsole(args.join(' '), 'warn');
-                            }
-                        };
-
-                        console.info = function(...args) {
-                            originalInfo.apply(console, args);
-                            if (window.parent && window.parent.logToConsole) {
-                                window.parent.logToConsole(args.join(' '), 'info');
-                            }
-                        };
-
-                        // Also catch errors
-                        window.onerror = function(message, source, lineno, colno, error) {
-                            if (window.parent && window.parent.logToConsole) {
-                                window.parent.logToConsole('خطأ: ' + message + ' في ' + source + ':' + lineno, 'error');
-                            }
-                            return false;
-                        };
-
-                        ${jsCode}
-                    <\/script>
-                </body>
-                </html>
-            `;
-
-            const previewDoc = previewFrame.contentDocument || previewFrame.contentWindow.document;
-            previewDoc.open();
-            previewDoc.write(fullCode);
-            previewDoc.close();
-
-            logToConsole('تم تحديث المعاينة', 'info');
-        }
-
-        function saveCode() {
-            const codeData = {
-                html: htmlEditor.getValue(),
-                css: cssEditor.getValue(),
-                js: jsEditor.getValue(),
-                timestamp: new Date().toISOString()
-            };
-            localStorage.setItem('codemaster_project', JSON.stringify(codeData));
-            showNotification('تم حفظ المشروع بنجاح', 'success');
-            logToConsole('تم حفظ المشروع في التخزين المحلي', 'success');
-        }
-
-        function loadCode() {
-            const savedData = localStorage.getItem('codemaster_project');
-            if (savedData) {
-                try {
-                    const codeData = JSON.parse(savedData);
-                    if (codeData.html) htmlEditor.setValue(codeData.html);
-                    if (codeData.css) cssEditor.setValue(codeData.css);
-                    if (codeData.js) jsEditor.setValue(codeData.js);
-                    updatePreview();
-                    showNotification('تم تحميل المشروع بنجاح', 'success');
-                    logToConsole('تم تحميل المشروع من التخزين المحلي', 'success');
-                } catch (e) {
-                    showNotification('خطأ في تحميل المشروع', 'error');
-                    logToConsole('خطأ في تحميل المشروع: ' + e.message, 'error');
-                }
-            } else {
-                showNotification('لا توجد بيانات محفوظة', 'warning');
-            }
-        }
-
-        function formatCode() {
-            const editor = editors[currentEditor];
-            const content = editor.getValue();
-            let formatted = content; // Placeholder for a real formatter
-            editor.setValue(formatted);
-            showNotification('تم تنسيق الكود', 'info');
-            logToConsole('تم تنسيق الكود', 'info');
-        }
-
-        function resetCode() {
-            if (confirm('هل أنت متأكد من إعادة تعيين الكود؟ سيتم فقدان جميع التغييرات غير المحفوظة')) {
-                htmlEditor.setValue('');
-                cssEditor.setValue('');
-                jsEditor.setValue('');
-                updatePreview();
-                showNotification('تم إعادة تعيين الكود', 'info');
-                logToConsole('تم إعادة تعيين الكود', 'warning');
-            }
-        }
-
-        function toggleFullscreen() {
-            const editorContainer = document.getElementById('editor-container');
-            editorContainer.classList.toggle('fullscreen');
-            const btn = document.getElementById('toggle-fullscreen');
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            if (editorContainer.classList.contains('fullscreen')) {
-                icon.className = 'fas fa-compress';
-                if(text) text.textContent = 'الخروج من ملء الشاشة';
-                showNotification('تم تفعيل وضع ملء الشاشة', 'info');
-            } else {
-                icon.className = 'fas fa-expand';
-                if(text) text.textContent = 'ملء الشاشة';
-            }
-            setTimeout(() => {
-                Object.values(editors).forEach(editor => editor.refresh());
-            }, 100);
-        }
-
-        function togglePreview() {
-            const previewPanel = document.getElementById('preview-panel');
-            const isHidden = previewPanel.style.display === 'none';
-            previewPanel.style.display = isHidden ? 'flex' : 'none';
-            const btn = document.getElementById('toggle-preview');
-            const icon = btn.querySelector('i');
-            const text = btn.querySelector('span');
-            if (!isHidden) {
-                icon.className = 'fas fa-eye-slash';
-                if(text) text.textContent = 'إظهار المعاينة';
-                showNotification('تم إخفاء المعاينة', 'info');
-            } else {
-                icon.className = 'fas fa-eye';
-                if(text) text.textContent = 'إخفاء المعاينة';
-            }
-        }
-
-        function openInNewTab() {
-            const blob = new Blob([getRunnableCode()], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            window.open(url, '_blank');
-            showNotification('تم فتح المشروع في علامة تبويب جديدة', 'success');
-            logToConsole('تم فتح المشروع في نافذة جديدة', 'info');
-        }
-
-        function getRunnableCode() {
-             const htmlCode = htmlEditor.getValue();
-            const cssCode = cssEditor.getValue();
-            const jsCode = jsEditor.getValue();
-            return `
-                <!DOCTYPE html>
-                <html lang="ar" dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                    <base target="_parent">
-                    <style>${cssCode}</style>
-                </head>
-                <body>
-                    ${htmlCode}
-                    <script>${jsCode}<\/script>
-                </body>
-                </html>
-            `;
-        }
-
-        function zoomIn() {
-            fontSize = Math.min(fontSize + 2, 24);
-            Object.values(editors).forEach(editor => {
-                editor.getWrapperElement().style.fontSize = fontSize + 'px';
-                editor.refresh();
-            });
-        }
-
-        function zoomOut() {
-            fontSize = Math.max(fontSize - 2, 10);
-            Object.values(editors).forEach(editor => {
-                editor.getWrapperElement().style.fontSize = fontSize + 'px';
-                editor.refresh();
-            });
-        }
-
-        function hideEditor() {
-            const editorContainer = document.getElementById('editor-container');
-            editorContainer.style.display = editorContainer.style.display === 'none' ? 'flex' : 'none';
-        }
-
-        function openSettings() {
-            document.getElementById('editor-theme').value = currentTheme;
-            document.getElementById('font-size').value = fontSize;
-            document.getElementById('line-wrapping').value = editors.html.getOption('lineWrapping') ? 'on' : 'off';
-            document.getElementById('settings-modal').classList.add('active');
-        }
-
-        function saveSettings() {
-            currentTheme = document.getElementById('editor-theme').value;
-            fontSize = parseInt(document.getElementById('font-size').value);
-            const lineWrapping = document.getElementById('line-wrapping').value === 'on';
-            Object.values(editors).forEach(editor => {
-                editor.setOption('theme', currentTheme);
-                editor.setOption('lineWrapping', lineWrapping);
-                editor.getWrapperElement().style.fontSize = fontSize + 'px';
-                editor.refresh();
-            });
-            const settings = {
-                theme: currentTheme,
-                fontSize: fontSize,
-                lineWrapping: lineWrapping
-            };
-            localStorage.setItem('codemaster_settings', JSON.stringify(settings));
-            document.getElementById('settings-modal').classList.remove('active');
-            showNotification('تم حفظ الإعدادات بنجاح', 'success');
-            logToConsole('تم تحديث إعدادات المحرر', 'info');
-        }
-
-        function exportProject() {
-            const htmlCode = htmlEditor.getValue();
-            const blob = new Blob([htmlCode], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'مشروع_CodeMaster.html';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showNotification('تم تصدير المشروع بنجاح', 'success');
-            logToConsole('تم تصدير المشروع', 'info');
-        }
-
-        function logToConsole(message, type = 'info') {
-            const consoleEl = document.getElementById('console-content');
-            const time = new Date().toLocaleTimeString('ar-EG');
-            const logEntry = document.createElement('div');
-            logEntry.className = \`console-log log-\${type}\`;
-            logEntry.innerHTML = \`<span class="log-time">\${time}</span> | \${message}\`;
-            consoleEl.appendChild(logEntry);
-            consoleEl.scrollTop = consoleEl.scrollHeight;
-            if (consoleEl.children.length > 100) {
-                consoleEl.removeChild(consoleEl.children[0]);
-            }
-        }
-
-        function showNotification(message, type = 'info') {
-            document.querySelectorAll('.notification').forEach(n => n.remove());
-            const notification = document.createElement('div');
-            notification.className = \`notification \${type} fade-in\`;
-            const icons = {
-                'success': 'check-circle',
-                'error': 'exclamation-circle',
-                'warning': 'exclamation-triangle',
-                'info': 'info-circle'
-            };
-            notification.innerHTML = \`<i class="fas fa-\${icons[type] || 'info-circle'} notification-icon"></i><span>\${message}</span>\`;
-            document.body.appendChild(notification);
-            setTimeout(() => {
-                notification.classList.add('hide');
-                setTimeout(() => notification.remove(), 300);
-            }, 5000);
-        }
-
-        window.addEventListener('load', function() {
-            const savedSettings = localStorage.getItem('codemaster_settings');
-            if (savedSettings) {
-                try {
-                    const settings = JSON.parse(savedSettings);
-                    currentTheme = settings.theme || 'monokai';
-                    fontSize = settings.fontSize || 14;
-                    const lineWrapping = settings.lineWrapping === true;
-                     Object.values(editors).forEach(editor => {
-                        editor.setOption('theme', currentTheme);
-                        editor.setOption('lineWrapping', lineWrapping);
-                        editor.getWrapperElement().style.fontSize = fontSize + 'px';
-                        editor.refresh();
-                    });
-                } catch (e) { console.error('Error loading settings:', e); }
-            }
-            setTimeout(() => {
-                const savedProject = localStorage.getItem('codemaster_project');
-                if (savedProject && confirm('تم العثور على مشروع محفوظ. هل تريد تحميله؟')) {
-                    loadCode();
-                }
-            }, 500);
         });
     </script>
 </body>

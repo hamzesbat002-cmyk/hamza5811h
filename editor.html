@@ -139,12 +139,19 @@
             <h1>محرر الأكواد</h1>
             <div class="controls">
                 <select id="language-select">
-                    <option value="htmlmixed">HTML</option>
-                    <option value="css">CSS</option>
-                    <option value="javascript">JavaScript</option>
-                    <option value="python">Python</option>
-                    <option value="clike">C++</option>
-                    <option value="text/x-csharp">C# Console</option>
+                    <optgroup label="لغات الويب">
+                        <option value="htmlmixed">HTML</option>
+                        <option value="css">CSS</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="text/typescript">TypeScript</option>
+                        <option value="text/x-scss">SCSS</option>
+                        <option value="markdown">Markdown</option>
+                    </optgroup>
+                    <optgroup label="غير مدعوم للتنفيذ">
+                        <option value="python">Python</option>
+                        <option value="clike">C++</option>
+                        <option value="text/x-csharp">C# Console</option>
+                    </optgroup>
                 </select>
                 <button id="run-button">تشغيل الكود</button>
             </div>
@@ -167,6 +174,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/javascript/javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/python/python.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/clike/clike.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/sass/sass.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/mode/markdown/markdown.min.js"></script>
+    <!-- Transpilers -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/typescript/4.5.5/typescript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sass.js/0.11.1/sass.sync.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.2/marked.min.js"></script>
     <script>
         const editor = CodeMirror.fromTextArea(document.getElementById('code-editor'), {
             lineNumbers: true,
@@ -190,31 +203,52 @@
             let fullHtml = '';
             const selectedLanguage = languageSelect.value;
 
-            if (selectedLanguage === 'htmlmixed') {
-                fullHtml = code;
-            } else if (selectedLanguage === 'css') {
-                fullHtml = `<style>${code}</style>`;
-            } else if (selectedLanguage === 'javascript') {
-                fullHtml = `<script>${code}<\/script>`;
-            } else if (selectedLanguage === 'python' || selectedLanguage === 'clike' || selectedLanguage === 'text/x-csharp') {
-                let langName = '';
-                if (selectedLanguage === 'python') {
-                    langName = 'Python';
-                } else if (selectedLanguage === 'clike') {
-                    langName = 'C++';
-                } else {
-                    langName = 'C# Console';
+            try {
+                if (selectedLanguage === 'htmlmixed') {
+                    fullHtml = code;
+                } else if (selectedLanguage === 'css') {
+                    fullHtml = `<style>${code}</style>`;
+                } else if (selectedLanguage === 'javascript') {
+                    fullHtml = `<script>${code}<\/script>`;
+                } else if (selectedLanguage === 'text/typescript') {
+                    const transpiledJs = ts.transpile(code);
+                    fullHtml = `<script>${transpiledJs}<\/script>`;
+                } else if (selectedLanguage === 'text/x-scss') {
+                    Sass.compile(code, function(result) {
+                        if (result.status === 0) {
+                            fullHtml = `<style>${result.text}</style>`;
+                            writeToIframe(fullHtml);
+                        } else {
+                            writeToIframe(`<pre style="color: red;">${result.formatted}</pre>`);
+                        }
+                    });
+                    return; // Sass compilation is async
+                } else if (selectedLanguage === 'markdown') {
+                    const html = marked.parse(code);
+                    fullHtml = `<style>body { color: var(--foreground); }</style>${html}`;
+                } else if (selectedLanguage === 'python' || selectedLanguage === 'clike' || selectedLanguage === 'text/x-csharp') {
+                    let langName = '';
+                    if (selectedLanguage === 'python') langName = 'Python';
+                    else if (selectedLanguage === 'clike') langName = 'C++';
+                    else langName = 'C# Console';
+                    fullHtml = `
+                        <body style="color: var(--foreground); font-family: 'Roboto Mono', monospace; padding: 10px;">
+                            <h2>غير معتمد</h2>
+                            <p>تنفيذ كود ${langName} مباشرة في المتصفح غير مدعوم في هذا المحرر.</p>
+                        </body>
+                    `;
                 }
-                fullHtml = `
-                    <body style="color: #f8f8f2; font-family: sans-serif; padding: 10px;">
-                        <h2>غير معتمد</h2>
-                        <p>تنفيذ كود ${langName} مباشرة في المتصفح غير مدعوم في هذا المحرر.</p>
-                    </body>
-                `;
+                writeToIframe(fullHtml);
+            } catch (error) {
+                writeToIframe(`<pre style="color: red;">${error}</pre>`);
             }
+        }
 
+        function writeToIframe(content) {
+            const output = document.getElementById('output');
+            const outputDoc = output.contentDocument || output.contentWindow.document;
             outputDoc.open();
-            outputDoc.write(fullHtml);
+            outputDoc.write(content);
             outputDoc.close();
         }
 

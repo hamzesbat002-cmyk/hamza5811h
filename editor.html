@@ -6,12 +6,34 @@
     <title>محرر الأكواد</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/codemirror.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.5/theme/dracula.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: sans-serif;
+        :root {
+            --background: #282a36;
+            --current-line: #44475a;
+            --foreground: #f8f8f2;
+            --comment: #6272a4;
+            --cyan: #8be9fd;
+            --green: #50fa7b;
+            --orange: #ffb86c;
+            --pink: #ff79c6;
+            --purple: #bd93f9;
+            --red: #ff5555;
+            --yellow: #f1fa8c;
+        }
+
+        * {
+            box-sizing: border-box;
             margin: 0;
-            background-color: #282a36;
-            color: #f8f8f2;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Roboto Mono', monospace;
+            margin: 0;
+            background-color: var(--background);
+            color: var(--foreground);
+            overflow: hidden;
         }
         .container {
             display: flex;
@@ -20,49 +42,94 @@
         }
         .header {
             background-color: #21222c;
-            padding: 10px;
+            padding: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--current-line);
+            gap: 1rem;
         }
         .header h1 {
             margin: 0;
             font-size: 1.5em;
+            color: var(--purple);
+            animation: fadeInDown 0.5s ease;
         }
-        #language-select {
-            padding: 5px;
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            animation: fadeInDown 0.5s ease 0.1s;
+        }
+        #language-select, #run-button {
+            padding: 0.5rem 1rem;
             border-radius: 5px;
-            background-color: #44475a;
-            color: #f8f8f2;
-            border: none;
+            background-color: var(--current-line);
+            color: var(--foreground);
+            border: 1px solid transparent;
+            font-family: inherit;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
+        #language-select:hover, #run-button:hover {
+            background-color: #52556a;
+            border-color: var(--pink);
+        }
+        #run-button {
+            background-color: var(--green);
+            color: var(--background);
+            font-weight: bold;
+        }
+        #run-button:hover {
+             background-color: #48e06f;
+        }
+
         .main-content {
             display: flex;
             flex-grow: 1;
+            overflow: hidden; /* Prevent iframe scrollbars on main layout */
         }
         .editor-container, .output-container {
             flex: 1;
             display: flex;
             flex-direction: column;
+            overflow: auto; /* Allow scrolling within panes */
+            animation: fadeInUp 0.5s ease;
         }
         .editor-container {
-            border-left: 1px solid #44475a;
+            border-left: 1px solid var(--current-line);
         }
         h2 {
-            margin: 10px;
+            margin: 0;
+            padding: 0.75rem 1rem;
+            background-color: #21222c;
+            font-size: 1rem;
+            color: var(--cyan);
+            border-bottom: 1px solid var(--current-line);
         }
         #code-editor {
             flex-grow: 1;
         }
         #output {
             flex-grow: 1;
-            background-color: #21222c;
+            background-color: var(--background);
             border: none;
-            color: #f8f8f2;
-            padding: 10px;
+            color: var(--foreground);
+            padding: 1rem;
         }
         .CodeMirror {
             height: 100%;
+            font-family: 'Roboto Mono', monospace;
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
@@ -70,13 +137,16 @@
     <div class="container">
         <div class="header">
             <h1>محرر الأكواد</h1>
-            <select id="language-select">
-                <option value="htmlmixed">HTML</option>
-                <option value="css">CSS</option>
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="clike">C++</option>
-            </select>
+            <div class="controls">
+                <select id="language-select">
+                    <option value="htmlmixed">HTML</option>
+                    <option value="css">CSS</option>
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="clike">C++</option>
+                </select>
+                <button id="run-button">تشغيل الكود</button>
+            </div>
         </div>
         <div class="main-content">
             <div class="editor-container">
@@ -140,18 +210,8 @@
             outputDoc.close();
         }
 
-        // Add a run button to the header
-        const header = document.querySelector('.header');
-        const runButton = document.createElement('button');
-        runButton.textContent = 'تشغيل الكود';
-        runButton.style.padding = '5px 10px';
-        runButton.style.borderRadius = '5px';
-        runButton.style.backgroundColor = '#50fa7b';
-        runButton.style.color = '#282a36';
-        runButton.style.border = 'none';
-        runButton.style.cursor = 'pointer';
+        const runButton = document.getElementById('run-button');
         runButton.addEventListener('click', runCode);
-        header.appendChild(runButton);
 
     </script>
 </body>
